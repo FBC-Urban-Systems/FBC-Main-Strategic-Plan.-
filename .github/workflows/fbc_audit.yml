@@ -1,0 +1,24 @@
+name: FBC System Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Run Revenue Simulation
+      run: python Projects/Project-I-Urban-Revenue/revenue_sim.py
+
+    - name: Run AI Engine Test
+      run: python Projects/Project-I-Urban-Revenue/ai_engine_v2.py
