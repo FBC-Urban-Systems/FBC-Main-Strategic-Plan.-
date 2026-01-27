@@ -1,24 +1,26 @@
-# FBC Digital Systems - Project III: Traffic Intelligence
-# Risk Analysis & Accident Prediction Script
+import random
 
-def analyze_traffic_risk(vehicle_density, weather_index):
+def predict_traffic_risk(vehicle_density, weather_condition):
     """
-    Calculates traffic risk score for insurance pricing.
-    Input: Density (vehicles/km), Weather Index (0-1).
+    FBC Traffic Risk Predictor v1.0
+    Analyzes real-time city data to prevent accidents.
     """
-    risk_score = (vehicle_density * 0.7) + (weather_index * 30)
+    # Simple AI Logic: Risk increases with density and bad weather
+    risk_score = (vehicle_density * 0.7)
     
-    # Tier labeling for insurance APIs
-    if risk_score > 75:
-        tier = "High Risk - Premium Pricing"
-    else:
-        tier = "Standard Risk"
-        
+    if weather_condition.lower() in ["rainy", "foggy"]:
+        risk_score += 30
+    
+    status = "HIGH RISK" if risk_score > 75 else "NORMAL"
+    
     return {
-        "risk_score": round(risk_score, 2),
-        "insurance_tier": tier
+        "risk_score": f"{round(risk_score, 2)}%",
+        "status": status,
+        "action": "Deploying Smart Traffic Units" if status == "HIGH RISK" else "Monitoring"
     }
 
-# Example: High density (100) and bad weather (0.8)
-report = analyze_traffic_risk(100, 0.8)
-print(f"FBC Intelligence Report: Traffic Risk is {report['risk_score']}. Suggested Tier: {report['insurance_tier']}")
+if __name__ == "__main__":
+    print("--- FBC TRAFFIC INTELLIGENCE ACTIVE ---")
+    # Simulating 85% density during rainy weather
+    analysis = predict_traffic_risk(85, "rainy")
+    print(f"Risk Analysis: {analysis}")
