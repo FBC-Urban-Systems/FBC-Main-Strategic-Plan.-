@@ -1,27 +1,23 @@
-class CityKernel:
-    """
-    FBC City-OS Core Kernel v1.0
-    The Central Brain for Autonomous Urban Operations.
-    """
-    def __init__(self, city_id):
-        self.city_id = city_id
-        self.systems_status = {
-            "Traffic_AI": "Standby",
-            "Revenue_Engine": "Active",
-            "Security_Ledger": "Encrypted"
-        }
+# FBC City-OS Core Kernel v2.0 - Centralized Integration
+from Projects.Project_I_Urban_Revenue.ai_engine_v2 import UrbanRevenueAI
+from Projects.Project_III_Traffic_Intelligence.accident_pred import predict_traffic_risk
 
-    def boot_system(self):
-        print(f"--- FBC City-OS Kernel Booting: {self.city_id} ---")
-        for system, status in self.systems_status.items():
-            print(f"[SYSTEM CHECK] {system}: {status} ... OK")
-        print("--- ALL SYSTEMS OPERATIONAL ---")
+class MasterCityKernel:
+    def __init__(self, city_name):
+        self.city_name = city_name
+        print(f"--- [KERNEL] Initializing FBC OS for {city_name} ---")
 
-    def allocate_resources(self, sector):
-        # Logic to distribute energy or data to specific city sectors
-        print(f"[KERNEL] Allocating AI computing power to: {sector}")
+    def run_all_systems(self):
+        # 1. Run Revenue Analysis
+        revenue_engine = UrbanRevenueAI(self.city_name)
+        revenue_engine.predict_future_yield(500.0) # $500M base
+
+        # 2. Run Traffic Risk Check
+        risk = predict_traffic_risk(75, "foggy")
+        print(f"--- [KERNEL] Traffic Risk Status: {risk['status']} ---")
+
+        print(f"--- [KERNEL] {self.city_name} is now FULLY OPERATIONAL ✅ ---")
 
 if __name__ == "__main__":
-    fbc_os = CityKernel("NEW_CAPITAL_01")
-    fbc_os.boot_system()
-    fbc_os.allocate_resources("Financial_District")
+    kernel = MasterCityKernel("Global-Sector-Alpha")
+    kernel.run_all_systems()
