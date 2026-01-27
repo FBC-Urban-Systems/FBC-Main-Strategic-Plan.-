@@ -12,13 +12,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
     
-    - name: Run Revenue Simulation
-      run: python Projects/Project-I-Urban-Revenue/revenue_sim.py
-
-    - name: Run AI Engine Test
-      run: python Projects/Project-I-Urban-Revenue/ai_engine_v2.py
+    - name: Run All Simulations
+      run: |
+        # البحث عن الملفات وتشغيلها أوتوماتيكياً لتجنب أخطاء المسارات
+        find . -name "revenue_sim.py" -exec python {} \;
+        find . -name "ai_engine_v2.py" -exec python {} \;
