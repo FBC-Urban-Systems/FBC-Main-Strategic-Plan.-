@@ -1,0 +1,27 @@
+{
+  "fbc_global_network": {
+    "total_target_cities": 80,
+    "deployment_schedule": {
+      "phase_1_north_america": {
+        "years": "2027-2029",
+        "primary_hubs": ["Austin", "Miami", "Toronto"],
+        "target_revenue_per_hub_usd": "45M"
+      },
+      "phase_2_mena_asean": {
+        "years": "2030-2031",
+        "primary_hubs": ["Dubai", "Riyadh", "Singapore"],
+        "target_revenue_per_hub_usd": "60M"
+      },
+      "phase_3_europe_japan": {
+        "years": "2032-2033",
+        "primary_hubs": ["Berlin", "London", "Tokyo"],
+        "target_revenue_per_hub_usd": "55M"
+      }
+    },
+    "technical_protocols": {
+      "data_privacy": "GDPR + FBC SHA-256",
+      "connectivity": "Satellite-based Urban OS Sync",
+      "ai_version": "v4.0-Global-Kernel"
+    }
+  }
+}
