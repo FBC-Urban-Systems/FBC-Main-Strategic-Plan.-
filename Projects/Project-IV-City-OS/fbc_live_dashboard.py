@@ -1,104 +1,91 @@
 import streamlit as st
 import pandas as pd
 import json
-import os
+from datetime import datetime
 
 # --- 1. GLOBAL BRANDING & CONFIGURATION ---
-st.set_page_config(page_title="FBC Global OS | CEO Terminal", layout="wide")
+st.set_page_config(page_title="FBC Global OS | CEO Command Center", layout="wide")
 
-# Custom CSS for a high-end Billion-Dollar Enterprise look
+# High-end Corporate UI Styling (Billion-Dollar Look)
 st.markdown("""
     <style>
-    .main { background-color: #05070a; }
-    .stMetric { border: 1px solid #00ffcc; border-radius: 10px; padding: 15px; background-color: #0e1117; }
-    h1, h2, h3 { color: #00ffcc !important; }
-    .stTabs [data-baseweb="tab-list"] { gap: 20px; }
+    .main { background-color: #05070a; color: #e0e0e0; }
+    .stMetric { border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; background-color: #0e1117; box-shadow: 0 4px 15px rgba(0,255,204,0.1); }
+    h1, h2, h3 { color: #00ffcc !important; font-family: 'Orbitron', sans-serif; }
+    .stButton>button { background-color: #00ffcc; color: black; border-radius: 5px; font-weight: bold; width: 100%; }
+    .status-box { border: 1px solid #333; padding: 15px; border-radius: 10px; background: #0e1117; }
+    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
     .stTabs [data-baseweb="tab"] { 
-        background-color: #0e1117; 
-        border: 1px solid #333; 
-        border-radius: 5px; 
-        padding: 10px 20px;
+        height: 50px; background-color: #0e1117; 
+        border-radius: 5px; border: 1px solid #333; color: #00ffcc;
     }
     </style>
     """, unsafe_allow_stdio=True)
 
-# --- 2. DATA ENGINE: LOADING GLOBAL MANIFEST ---
-def load_global_data():
-    try:
-        # Connects to our global city expansion database
-        with open('global_cities_manifest.json', 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        return None
-
-manifest_data = load_global_data()
-
-# --- 3. EXECUTIVE HEADER ---
-st.title("🏙️ FBC DIGITAL SYSTEMS | GLOBAL COMMAND")
-st.markdown("#### *Proprietary AI-Driven Urban Revenue Operating System (2027-2037)*")
-st.divider()
-
-# --- 4. KEY PERFORMANCE INDICATORS (KPIs) ---
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Corporate Valuation Target", "$35.0 Billion", "2037 Projection")
-with col2:
-    if manifest_data:
-        city_count = manifest_data['fbc_global_network']['total_target_cities']
-        st.metric("Strategic Global Hubs", f"{city_count} Cities", "Phase I-III")
-    else:
-        st.metric("Strategic Global Hubs", "80 Cities", "Target Set")
-with col3:
-    st.metric("Security Protocol", "SHA-256 Ledger", "ACTIVE & ENCRYPTED")
+# --- 2. EXECUTIVE HEADER ---
+col_h1, col_h2 = st.columns([3, 1])
+with col_h1:
+    st.title("🏙️ FBC DIGITAL SYSTEMS | GLOBAL OS")
+    st.subheader("Strategic Command Center: Phase I Deployment")
+with col_h2:
+    st.metric("SYSTEM STATUS", "ACTIVE", delta="SHA-256 VERIFIED")
 
 st.divider()
 
-# --- 5. OPERATIONAL CONTROL TABS ---
-tab1, tab2, tab3 = st.tabs(["🌍 GLOBAL DEPLOYMENT", "📈 REVENUE OPTIMIZER", "🛡️ SYSTEM AUDIT"])
+# --- 3. CORE FINANCIAL KPIS (The $35B Path) ---
+m1, m2, m3, m4 = st.columns(4)
+with m1:
+    st.metric("VALUATION TARGET", "$35,000,000,000", delta="By 2037")
+with m2:
+    st.metric("EXPANSION NODES", "80 GLOBAL CITIES", delta="Active Growth")
+with m3:
+    st.metric("UNIT ECONOMICS", "42x LTV/CAC", delta="Optimized")
+with m4:
+    st.metric("PHASE I ARR", "$40M - $60M", delta="Target")
+
+# --- 4. THE STRATEGIC WORKSPACE ---
+tab1, tab2, tab3 = st.tabs(["🌍 Global Expansion", "💰 Revenue Optimizer", "🧠 Ecosystem Health"])
 
 with tab1:
-    st.subheader("Global Expansion & Deployment Roadmap")
-    if manifest_data:
-        hubs = manifest_data['fbc_global_network']['deployment_schedule']
-        p1 = hubs['phase_1_north_america']['primary_hubs']
-        p2 = hubs['phase_2_mena_asean']['primary_hubs']
-        
-        st.info(f"**Current Strategic Focus (Phase I):** {', '.join(p1)}")
-        st.success(f"**Upcoming Expansion (Phase II):** {', '.join(p2)}")
-        
-        # Mapping target hubs for visual impact
-        map_data = pd.DataFrame({
-            'lat': [30.2672, 25.2048, 24.7136, 1.3521], # Austin, Dubai, Riyadh, Singapore
-            'lon': [-97.7431, 55.2708, 46.6753, 103.8198]
-        })
-        st.map(map_data)
+    st.subheader("Global Deployment Hubs")
+    # Data derived from global_cities_manifest.json
+    map_data = pd.DataFrame({
+        'city': ['Austin (HQ)', 'Dubai', 'Riyadh', 'Singapore', 'London', 'Toronto'],
+        'lat': [30.2672, 25.2048, 24.7136, 1.3521, 51.5074, 43.6532],
+        'lon': [-97.7431, 55.2708, 46.6753, 103.8198, -0.1278, -79.3832]
+    })
+    st.map(map_data)
+    st.info("Primary Focus: North America & MENA Region (Saudi Arabia / UAE)")
 
 with tab2:
-    st.subheader("Urban AI Revenue Simulator")
-    st.write("Projected efficiency gains through FBC Project I integration.")
+    st.subheader("Project I: AI Revenue Engine Simulation")
+    col_in, col_out = st.columns([1, 1])
     
-    city_input = st.number_input("Enter City Annual Budget/Revenue ($)", value=50000000, step=1000000)
-    # Applying the 25% AI Revenue Boost from our core logic
-    optimized_revenue = city_input * 1.25
-    net_gain = optimized_revenue - city_input
+    with col_in:
+        base_val = st.number_input("Input City Revenue Base ($M)", value=100.0, step=10.0)
+        efficiency = st.slider("AI Optimization Factor (%)", 10, 30, 25)
     
-    c_res1, c_res2 = st.columns(2)
-    with c_res1:
-        st.success(f"FBC Optimized Total: **${optimized_revenue:,.0f}**")
-    with c_res2:
-        st.warning(f"Projected AI Gain: **+${net_gain:,.0f}**")
+    with col_out:
+        boosted = base_val * (1 + (efficiency/100))
+        net = boosted - base_val
+        st.success(f"Optimized Annual Revenue: ${boosted:,.2f}M")
+        st.warning(f"AI-Generated Surplus: +${net:,.2f}M")
 
 with tab3:
-    st.subheader("Core System Integrity Log")
-    st.code("""
-    [BOOT] FBC OS v3.1 Kernel Initialized...
-    [AUTH] CEO Access Verified: Karim Mostafa
-    [SEC]  SHA-256 Handshake: SUCCESS
-    [AI]   Revenue Prediction Engine: ONLINE
-    [NET]  Global Cities Sync: ACTIVE
-    [SYNC] Ready for Phase I Pilot Deployment.
-    """, language="bash")
+    st.subheader("Ecosystem Integration Status")
+    projects = {
+        "Project I: Urban Revenue Engine": "OPERATIONAL ✅",
+        "Project II: Private Smart Districts": "ACTIVE ✅",
+        "Project III: Traffic Intelligence": "BETA TESTING 🚦",
+        "Project IV: City-OS Kernel": "INTEGRATING 🧠",
+        "Project V: Digital Earth Data": "READY 🔒",
+        "Project VI: Global Scaling": "SIMULATING 🌍"
+    }
+    for p, status in projects.items():
+        c1, c2 = st.columns([2, 1])
+        c1.write(f"**{p}**")
+        c2.info(status)
 
-# --- 6. FOOTER ---
+# --- 5. FOOTER ---
 st.divider()
-st.caption("CONFIDENTIAL | FBC Digital Systems Intellectual Property © 2026 | Austin, TX - Global")
+st.caption(f"FBC Confidential CEO Terminal | Last Sync: {datetime.now().isoformat()} | Secure Node: TX-AUS-001")
