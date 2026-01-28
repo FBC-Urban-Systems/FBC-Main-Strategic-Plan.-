@@ -8,26 +8,43 @@ on:
 
 jobs:
   system-verification:
+    name: Executive System Integrity Check
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-    - name: Set up Python Environment
+    - name: Configure Python Environment
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install Core Dependencies
-      run: pip install -r requirements.txt
+    - name: Install System Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install streamlit pandas numpy
+        # If requirements.txt exists, it will be prioritized
+        if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
 
-    - name: 🛡️ Verify Security Ledger (Project III)
+    - name: 🛡️ Audit Security Ledger (Project III)
       run: python Projects/Project-III-Security-Ledger/secure_vault.py
 
     - name: 💰 Audit Revenue Engine (Project I)
       run: python Projects/Project-I-Urban-Revenue/ai_engine_v2.py
 
-    - name: 🌍 Run Expansion Simulation (Project VI)
+    - name: 🌍 Verify Global Expansion Simulation (Project VI)
       run: python Projects/Project-VI-Global-Dominance/global_expansion_sim.py
 
-    - name: 🧠 Kernel Integrity Check
-      run: python core_kernel.py
+    - name: 🧠 Core Kernel Integrity Verification
+      run: |
+        if [ -f "core_kernel.py" ]; then
+          python core_kernel.py
+        elif [ -f "Projects/Project-IV-City-OS/core_kernel.py" ]; then
+          python Projects/Project-IV-City-OS/core_kernel.py
+        elif [ -f "Projects/Projects/Project-IV-City-OS/core_kernel.py" ]; then
+          python Projects/Projects/Project-IV-City-OS/core_kernel.py
+        else
+          echo "WARNING: Core Kernel not found in standard paths. Check directory structure."
+          exit 1
+        fi
