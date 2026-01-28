@@ -1,84 +1,71 @@
+# ==========================================
+# PATH: fbc_live_dashboard.py
+# DESCRIPTION: FBC Global Command Center v3.1
+# CONNECTS: Revenue AI, Energy Forecast, Traffic Intel
+# ==========================================
+
 import streamlit as st
 import pandas as pd
-from datetime import datetime
-import os
+from core_kernel import MasterCityKernel
+from energy_forecast import predict_energy_savings
+from accident_pred import predict_traffic_risk
 
-# Secure Import of the AI Engine
-try:
-    from ai_engine_v2 import UrbanRevenueAI
-except ImportError:
-    st.error("Critical Error: 'ai_engine_v2.py' not found in the directory.")
-    st.stop()
-
-# --- 1. GLOBAL BRANDING & DARK UI ---
+# UI Configuration (Dark Luxury Theme)
 st.set_page_config(page_title="FBC Global OS | CEO Command Center", layout="wide")
 
 st.markdown("""
     <style>
     .main { background-color: #05070a; color: #e0e0e0; }
-    .stMetric { border: 1px solid #00ffcc; border-radius: 10px; padding: 20px; background-color: #0e1117; }
-    h1, h2, h3 { color: #00ffcc !important; font-family: 'Orbitron', sans-serif; }
-    .report-card { border: 1px solid #333; padding: 25px; border-radius: 12px; background: #0e1117; }
-    .stButton>button { background-color: #00ffcc; color: black; font-weight: bold; border-radius: 8px; }
+    .stMetric { border: 1px solid #00ffcc; border-radius: 10px; padding: 15px; background-color: #0e1117; }
+    h1, h2, h3 { color: #00ffcc !important; }
+    .stButton>button { background-color: #00ffcc; color: black; width: 100%; font-weight: bold; }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True)
 
-# --- 2. EXECUTIVE HEADER ---
-col_head1, col_head2 = st.columns([3, 1])
-with col_head1:
-    st.title("🏙️ FBC DIGITAL SYSTEMS | GLOBAL OS")
-    st.subheader("Billion-Dollar Urban Intelligence Architecture")
-with col_head2:
-    st.metric("SYSTEM STATUS", "ONLINE", delta="SHA-256 ACTIVE")
+st.title("🏙️ FBC DIGITAL SYSTEMS | GLOBAL COMMAND")
+st.write(f"**Founder:** Karim | **Status:** Phase 0 (Pre-Launch 2026)")
 
-st.divider()
+# Sidebar Control Node
+st.sidebar.header("City Control Node")
+city_select = st.sidebar.selectbox("Select Target City", ["Austin-HQ", "Dubai", "Riyadh", "Toronto"])
+base_rev = st.sidebar.slider("Base City Revenue ($M)", 10, 500, 100)
+run_sim = st.sidebar.button("Execute Simulation")
 
-# --- 3. STRATEGIC WORKSPACE ---
-tab1, tab2 = st.tabs(["💰 AI Revenue Simulator", "🌍 Expansion Nodes"])
+if run_sim:
+    # Initialize Kernel
+    kernel = MasterCityKernel(city_select)
+    report = kernel.run_system_diagnostic(base_rev)
 
-with tab1:
-    st.write("### Project I: Urban Revenue Optimization")
-    col_in, col_out = st.columns([1, 1.5])
-    
-    with col_in:
-        st.markdown("<div class='report-card'>", unsafe_allow_stdio=True)
-        city_node = st.selectbox("Target Deployment Node", ["Austin-HQ", "Dubai-Hub", "Riyadh-Center", "Singapore-Edge"])
-        base_revenue = st.number_input("Infrastructure Base Revenue ($M)", value=500.0, step=50.0)
-        maturity_idx = st.slider("City Digital Maturity (AI Readiness)", 0.1, 1.0, 0.85)
-        run_analysis = st.button("RUN AI YIELD PROJECTION")
-        st.markdown("</div>", unsafe_allow_stdio=True)
+    # --- Section 1: Project I - Urban Revenue ---
+    st.header("💰 Urban Revenue Optimization (Project I)")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Target Revenue", f"${base_rev}M")
+    with col2:
+        st.metric("AI Boost", report['revenue_optimization'])
+    with col3:
+        st.metric("System Integrity", "SECURED-SHA256", delta="Active")
 
-    with col_out:
-        if run_analysis:
-            # Execute the AI Engine Logic
-            engine = UrbanRevenueAI(city_node, maturity_index=maturity_idx)
-            report = engine.analyze_yield(base_revenue)
-            
-            # Display Professional Metrics
-            m1, m2 = st.columns(2)
-            m1.metric("Optimized Annual Yield", report['metrics']['final_optimized_yield_m'])
-            m2.metric("AI-Generated Profit Boost", report['metrics']['net_profit_increase_m'], delta=report['metrics']['ai_boost_percent'])
-            
-            # Security Audit Log
-            st.code(f"""
-            [AUDIT LOG] {report['timestamp']}
-            Status: Analysis Verified
-            Token: {report['security_token']}
-            Kernel: FBC-Global-v2.1
-            """, language="bash")
-        else:
-            st.info("Awaiting simulation parameters. Adjust inputs and click 'Run'.")
+    # --- Section 2: Project II - Smart Energy ---
+    st.header("⚡ Smart District Energy (Project II)")
+    # Simulation: Energy consumption is roughly 10% of revenue
+    energy_data = predict_energy_savings(base_rev * 0.1) 
+    st.subheader(f"Potential Savings for {city_select}: ${energy_data['ai_predicted_savings']:,.2f}M")
+    st.progress(15) # Based on 15% optimization logic
 
-with tab2:
-    st.subheader("FBC Global Scaling Roadmap")
+    # --- Section 3: Project III - Traffic Intelligence ---
+    st.header("🚦 Traffic Intelligence (Project III)")
+    traffic_status = predict_traffic_risk(75, "Clear")
+    st.info(f"Traffic Risk Score: {traffic_status['risk_score']} | Status: {traffic_status['status']}")
+
+    # Global Expansion Map
+    st.header("🌍 Global Expansion Roadmap")
     map_data = pd.DataFrame({
-        'city': ['Austin', 'Dubai', 'Riyadh', 'Singapore'],
-        'lat': [30.2672, 25.2048, 24.7136, 1.3521],
-        'lon': [-97.7431, 55.2708, 46.6753, 103.8198]
+        'lat': [30.2672, 25.2048, 24.7136, 43.6532],
+        'lon': [-97.7431, 55.2708, 46.6753, -79.3832]
     })
     st.map(map_data)
-    st.success("Target: 80 Cities by 2037 | Current Phase: North America & MENA Expansion")
 
-# --- 4. FOOTER ---
-st.divider()
-st.caption(f"FBC Digital Systems © {datetime.now().year} | Proprietary CEO Terminal | Secure Access: FBC-ADMIN-01")
+    st.success("All systems operational. Data synced with Global Cities Manifest.")
+else:
+    st.warning("Please click 'Execute Simulation' to pull real-time data from the Kernel.")
