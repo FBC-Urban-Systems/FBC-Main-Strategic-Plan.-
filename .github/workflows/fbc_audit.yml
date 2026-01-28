@@ -1,4 +1,4 @@
-name: FBC System Audit
+name: FBC Global System Audit
 
 on:
   push:
@@ -7,19 +7,27 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  system-verification:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Set up Python
+
+    - name: Set up Python Environment
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-    
-    - name: Run All Simulations
-      run: |
-        # البحث عن الملفات وتشغيلها أوتوماتيكياً لتجنب أخطاء المسارات
-        find . -name "revenue_sim.py" -exec python {} \;
-        find . -name "ai_engine_v2.py" -exec python {} \;
+
+    - name: Install Core Dependencies
+      run: pip install -r requirements.txt
+
+    - name: 🛡️ Verify Security Ledger (Project III)
+      run: python Projects/Project-III-Security-Ledger/secure_vault.py
+
+    - name: 💰 Audit Revenue Engine (Project I)
+      run: python Projects/Project-I-Urban-Revenue/ai_engine_v2.py
+
+    - name: 🌍 Run Expansion Simulation (Project VI)
+      run: python Projects/Project-VI-Global-Dominance/global_expansion_sim.py
+
+    - name: 🧠 Kernel Integrity Check
+      run: python core_kernel.py
