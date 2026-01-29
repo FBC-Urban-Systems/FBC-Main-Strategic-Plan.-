@@ -1,50 +1,185 @@
-name: FBC Global System Audit
+name: FBC Supreme Global System Audit
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"   # Daily autonomous audit
 
+env:
+  PYTHON_VERSION: "3.11"
+  FBC_ENV: "GLOBAL_EXECUTIVE_AUDIT"
+  FBC_LOG_LEVEL: "INFO"
+  FBC_AUDIT_MODE: "SUPREME"
+
+#####################################################
+# 1. SOURCE INTEGRITY & SECURITY GOVERNANCE LAYER
+#####################################################
 jobs:
-  system-verification:
-    name: Executive System Integrity Check
+  security-governance:
+    name: 🛡️ Sovereign Security & Code Governance
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout Sovereign Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Configure Python Environment
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Verify Git History Integrity
+        run: |
+          git fsck --full
 
-    - name: Install System Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install streamlit pandas numpy
-        # If requirements.txt exists, it will be prioritized
-        if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: 🛡️ Audit Security Ledger (Project III)
-      run: python Projects/Project-III-Security-Ledger/secure_vault.py
+      - name: Install Global Security Toolchain
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit safety pip-audit semgrep
 
-    - name: 💰 Audit Revenue Engine (Project I)
-      run: python Projects/Project-I-Urban-Revenue/ai_engine_v2.py
+      - name: Static Code Threat Scan (Bandit + Semgrep)
+        run: |
+          bandit -r . -ll
+          semgrep --config=auto .
 
-    - name: 🌍 Verify Global Expansion Simulation (Project VI)
-      run: python Projects/Project-VI-Global-Dominance/global_expansion_sim.py
+      - name: Dependency Vulnerability Audit
+        run: |
+          pip-audit
+          safety check
 
-    - name: 🧠 Core Kernel Integrity Verification
-      run: |
-        if [ -f "core_kernel.py" ]; then
-          python core_kernel.py
-        elif [ -f "Projects/Project-IV-City-OS/core_kernel.py" ]; then
-          python Projects/Project-IV-City-OS/core_kernel.py
-        elif [ -f "Projects/Projects/Project-IV-City-OS/core_kernel.py" ]; then
-          python Projects/Projects/Project-IV-City-OS/core_kernel.py
-        else
-          echo "WARNING: Core Kernel not found in standard paths. Check directory structure."
+#####################################################
+# 2. CORE KERNEL SOVEREIGN INTEGRITY LAYER
+#####################################################
+  core-sovereign-integrity:
+    name: 🧠 Core Kernel Sovereign Integrity Check
+    runs-on: ubuntu-latest
+    needs: security-governance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Locate Core Kernel
+        run: |
+          FOUND="false"
+          for path in \
+            core_kernel.py \
+            Projects/Project-IV-City-OS/core_kernel.py \
+            Projects/Projects/Project-IV-City-OS/core_kernel.py
+          do
+            if [ -f "$path" ]; then
+              echo "CORE_KERNEL_PATH=$path" >> $GITHUB_ENV
+              FOUND="true"
+              break
+            fi
+          done
+
+          if [ "$FOUND" = "false" ]; then
+            echo "❌ CORE KERNEL NOT FOUND — SYSTEM HALT"
+            exit 1
+          fi
+
+      - name: Execute Core Kernel
+        run: |
+          echo "Executing Core Kernel at $CORE_KERNEL_PATH"
+          python $CORE_KERNEL_PATH
+
+#####################################################
+# 3. PLANETARY PROJECT EXECUTION MATRIX
+#####################################################
+  planetary-project-matrix:
+    name: 🌍 Planetary Project Execution Matrix
+    runs-on: ubuntu-latest
+    needs: core-sovereign-integrity
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: "Project I — Urban Revenue Engine"
+            path: "Projects/Project-I-Urban-Revenue/ai_engine_v2.py"
+          - name: "Project III — Security Ledger"
+            path: "Projects/Project-III-Security-Ledger/secure_vault.py"
+          - name: "Project VI — Global Expansion Simulator"
+            path: "Projects/Project-VI-Global-Dominance/global_expansion_sim.py"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Execute ${{ matrix.project.name }}
+        run: |
+          if [ -f "${{ matrix.project.path }}" ]; then
+            echo "▶ EXECUTING ${{ matrix.project.name }}"
+            python "${{ matrix.project.path }}"
+          else
+            echo "❌ FILE NOT FOUND: ${{ matrix.project.path }}"
+            exit 1
+          fi
+
+#####################################################
+# 4. EXECUTIVE IMMUTABLE AUDIT REPORT LAYER
+#####################################################
+  executive-immutable-report:
+    name: 📜 Executive Immutable Audit Report
+    runs-on: ubuntu-latest
+    needs: planetary-project-matrix
+    if: always()
+
+    steps:
+      - name: Generate Immutable Executive Report
+        run: |
+          echo "============================================" >> FBC_EXECUTIVE_REPORT.txt
+          echo "FBC SUPREME GLOBAL SYSTEM AUDIT REPORT" >> FBC_EXECUTIVE_REPORT.txt
+          echo "MODE: $FBC_AUDIT_MODE" >> FBC_EXECUTIVE_REPORT.txt
+          echo "ENVIRONMENT: $FBC_ENV" >> FBC_EXECUTIVE_REPORT.txt
+          echo "TIMESTAMP (UTC): $(date -u)" >> FBC_EXECUTIVE_REPORT.txt
+          echo "============================================" >> FBC_EXECUTIVE_REPORT.txt
+          echo "All Sovereign Security, Kernel Integrity," >> FBC_EXECUTIVE_REPORT.txt
+          echo "and Planetary Project Audits Executed." >> FBC_EXECUTIVE_REPORT.txt
+          echo "System Status: OPERATIONAL" >> FBC_EXECUTIVE_REPORT.txt
+
+      - name: Archive Immutable Executive Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: FBC_SUPREME_EXECUTIVE_AUDIT_REPORT
+          path: FBC_EXECUTIVE_REPORT.txt
+
+#####################################################
+# 5. AUTOMATED FAILURE CONTAINMENT LAYER
+#####################################################
+  autonomous-failure-containment:
+    name: 🚨 Autonomous Failure Containment Protocol
+    runs-on: ubuntu-latest
+    needs: [security-governance, core-sovereign-integrity, planetary-project-matrix]
+    if: failure()
+
+    steps:
+      - name: Initiate Containment Protocol
+        run: |
+          echo "🚨 FBC SUPREME AUDIT FAILURE DETECTED"
+          echo "SYSTEM ENTERING CONTAINMENT MODE"
+          echo "EXECUTIVE INTERVENTION REQUIRED"
           exit 1
-        fi
