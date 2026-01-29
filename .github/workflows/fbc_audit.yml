@@ -30,28 +30,30 @@ jobs:
           fetch-depth: 0
 
       - name: Verify Git History Integrity
-        run: |
-          git fsck --full
+        run: git fsck --full
 
       - name: Setup Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Global Security Toolchain
+      - name: Install Security Toolchain
         run: |
           python -m pip install --upgrade pip
-          pip install bandit safety pip-audit semgrep
+          pip install bandit safety pip-audit
 
-      - name: Static Code Threat Scan (Bandit + Semgrep)
-        run: |
-          bandit -r . -ll
-          semgrep --config=auto .
+      - name: Static Code Threat Scan (Bandit)
+        run: bandit -r . -ll
 
       - name: Dependency Vulnerability Audit
         run: |
           pip-audit
           safety check
+
+      - name: Semgrep Official Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
 
 #####################################################
 # 2. CORE KERNEL SOVEREIGN INTEGRITY LAYER
@@ -157,11 +159,11 @@ jobs:
           echo "ENVIRONMENT: $FBC_ENV" >> FBC_EXECUTIVE_REPORT.txt
           echo "TIMESTAMP (UTC): $(date -u)" >> FBC_EXECUTIVE_REPORT.txt
           echo "============================================" >> FBC_EXECUTIVE_REPORT.txt
-          echo "All Sovereign Security, Kernel Integrity," >> FBC_EXECUTIVE_REPORT.txt
+          echo "All Security, Kernel Integrity," >> FBC_EXECUTIVE_REPORT.txt
           echo "and Planetary Project Audits Executed." >> FBC_EXECUTIVE_REPORT.txt
           echo "System Status: OPERATIONAL" >> FBC_EXECUTIVE_REPORT.txt
 
-      - name: Archive Immutable Executive Report
+      - name: Archive Executive Report
         uses: actions/upload-artifact@v4
         with:
           name: FBC_SUPREME_EXECUTIVE_AUDIT_REPORT
@@ -181,5 +183,4 @@ jobs:
         run: |
           echo "🚨 FBC SUPREME AUDIT FAILURE DETECTED"
           echo "SYSTEM ENTERING CONTAINMENT MODE"
-          echo "EXECUTIVE INTERVENTION REQUIRED"
           exit 1
