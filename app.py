@@ -1,7 +1,8 @@
 # ==========================================
 # PATH: /app.py
-# DESCRIPTION: FBC Full Phase I - Secure Command Center
-# FEATURES: Live AI, Multi-Sector, SHA-256 Security Ledger
+# DESCRIPTION: FBC Global Command Center - Phase I Final MVP
+# VERSION: v3.6.5 (Production Ready)
+# FEATURES: Multi-Project Sync, AI Risk Engine, Secure Hash Ledger
 # ==========================================
 
 import streamlit as st
@@ -9,7 +10,7 @@ import sys
 import os
 import random
 
-# --- Environment Path Integration ---
+# --- Dynamic Path Integration for GitHub Codespaces ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_PATHS = [
     "Projects/Project-I-Urban-Revenue",
@@ -22,85 +23,108 @@ for path in PROJECT_PATHS:
     if full_path not in sys.path:
         sys.path.append(full_path)
 
-# --- AI & Security Engines Import ---
+# --- FBC AI & Security Engines Import ---
 try:
     from revenue_optimizer import RevenueOptimizer
     from energy_forecast import predict_energy_savings
     from accident_pred import TrafficRiskEngine
     from secure_vault import FBCSecureVault
-    SYSTEM_STATUS = "SECURED ✅"
+    SYSTEM_STATUS = "FULLY OPERATIONAL ✅"
 except ImportError as e:
-    SYSTEM_STATUS = f"KERNEL ERROR: {e} ❌"
+    SYSTEM_STATUS = f"MODULE SYNC ERROR: {e} ❌"
 
-# --- Page Branding ---
-st.set_page_config(page_title="FBC Global | Secure Portal", layout="wide", page_icon="🛡️")
+# --- UI Layout & Custom Styling ---
+st.set_page_config(page_title="FBC Global OS | Command Center", layout="wide", page_icon="🛡️")
 
-# Custom UI for Security Look
 st.markdown("""
     <style>
-    .main { background-color: #0d1117; color: #c9d1d9; }
-    .stMetric { background-color: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 10px; }
-    .status-box { padding: 10px; border-radius: 5px; border-left: 5px solid #ffd700; background: #1c2128; }
+    .main { background-color: #0d1117; color: #ffffff; }
+    .stMetric { background-color: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 12px; }
+    .security-card { 
+        background-color: #010409; 
+        border-left: 5px solid #ffd700; 
+        padding: 15px; 
+        font-family: monospace;
+        font-size: 0.8em;
+        color: #8b949e;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🛡️ FBC Global Secure Command Center")
-st.write(f"Encryption Standard: **SHA-256 AES** | System: **{SYSTEM_STATUS}**")
+# --- Top Header ---
+st.title("🏙️ FBC Global Strategic Command Center")
+st.write(f"Kernel Status: **{SYSTEM_STATUS}** | Security Protocol: **SHA-256 Active**")
 st.markdown("---")
 
-# --- Sidebar Logic ---
-st.sidebar.image("https://img.shields.io/badge/FBC_SECURITY-ACTIVE-green?style=for-the-badge")
-view = st.sidebar.radio("Executive View", ["Strategic Revenue (Gov)", "Infrastructure Optimization (Private)"])
+# --- Sidebar Control Center ---
+st.sidebar.image("https://img.shields.io/badge/FBC_OS-V3.6_GOLD-gold?style=for-the-badge")
+st.sidebar.header("🕹️ Deployment Sector")
+mode = st.sidebar.selectbox("Select View", ["Municipal Government (Project I & III)", "Private Smart Districts (Project II)"])
 
 vault = FBCSecureVault()
 
-if view == "Strategic Revenue (Gov)":
-    st.header("🚦 Municipal AI Intelligence")
+# ==========================================
+# SECTOR 1: Municipal Government (Revenue & Safety)
+# ==========================================
+if mode == "Municipal Government (Project I & III)":
+    st.header("🚦 Municipal Intelligence & Yield Optimization")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        city = st.text_input("Target City Node", "Austin-TX")
-        rev = st.number_input("Annual Municipal Revenue ($)", value=20000000)
+    col_a, col_b = st.columns(2)
+    
+    with col_a:
+        st.subheader("Traffic Safety AI")
+        city_node = st.text_input("Active City Node", "Austin-TX")
+        density = st.slider("Live Traffic Density (Units/km)", 0, 300, 115)
         
-        # Risk Logic
-        risk_eng = TrafficRiskEngine(city)
-        risk_data = risk_eng.analyze_real_time_risk(120)
-        st.metric("AI Risk Index", risk_data['risk_score'], delta=risk_data['live_weather'])
+        # Link to Project III Logic
+        risk_engine = TrafficRiskEngine(city_node)
+        risk_results = risk_engine.analyze_real_time_risk(density)
+        
+        st.metric("Risk Score Index", risk_results['risk_score'], delta=f"Weather: {risk_results['live_weather']}")
+        st.write(f"Emergency Status: **{risk_results['status']}**")
 
-    with col2:
-        # Revenue Logic
-        opt = RevenueOptimizer(city)
-        gains = opt.project_incremental_gain(rev)
-        st.metric("Projected Extra Income", f"${gains['Total_City_Gain']:,.2f}", delta="+25%")
+    with col_b:
+        st.subheader("Revenue Growth Hub")
+        base_revenue = st.number_input("Annual City Revenue ($)", value=25000000)
         
-        # Security Ledger Integration
-        st.subheader("🔐 Secure Commission Ledger")
-        proof = vault.generate_proof("PROJECT_I", city, gains['FBC_Commission'])
+        # Link to Project I Logic
+        rev_optimizer = RevenueOptimizer(city_node)
+        gains = rev_optimizer.project_incremental_gain(base_revenue)
         
-        st.markdown(f"""
-        <div class="status-box">
-            <b>Transaction Verified:</b><br>
-            FBC Commission: ${gains['FBC_Commission']:,.2f}<br>
-            <small>Hash: {proof['audit_hash'][:32]}...</small>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric("AI Incremental Gain", f"${gains['Total_City_Gain']:,.2f}", delta="+25% Efficiency")
+        st.success(f"FBC Commission (20%): ${gains['FBC_Commission']:,.2f}")
+        
+        # --- SHA-256 Security Proof ---
+        st.markdown("**🛡️ Transaction Security Proof:**")
+        proof = vault.generate_proof("PROJECT_I", city_node, gains['FBC_Commission'])
+        st.markdown(f"""<div class="security-card">ID: {proof['audit_hash']}<br>VERIFIED_BY_FBC_KERNEL</div>""", unsafe_allow_html=True)
 
+# ==========================================
+# SECTOR 2: Private Smart Districts (Optimization)
+# ==========================================
 else:
-    st.header("🏢 Private District Energy Vault")
+    st.header("🏢 Private District Infrastructure Control")
     
-    dist_id = st.text_input("District ID", "FBC-EGYPT-01")
-    bill = st.number_input("Monthly Energy Bill ($)", value=150000)
+    col_1, col_2 = st.columns(2)
     
-    res = predict_energy_savings(bill)
+    with col_1:
+        dist_id = st.text_input("District ID", "FBC-EGYPT-001")
+        monthly_bill = st.number_input("Average Monthly Energy Cost ($)", value=180000)
+        
+        # Link to Project II Logic
+        energy_results = predict_energy_savings(monthly_bill)
+        
+        st.metric("AI Savings Forecast", f"${energy_results['ai_predicted_savings']:,.2f}", delta="-15% Load Reduction")
     
-    c1, c2 = st.columns(2)
-    with c1:
-        st.metric("Optimized Monthly Savings", f"${res['ai_predicted_savings']:,.2f}", delta="-15%")
-    with c2:
-        # Secure the Energy savings report
-        st.subheader("📑 Audit Trail")
-        e_proof = vault.generate_proof("PROJECT_II", dist_id, res['ai_predicted_savings'])
-        st.code(f"Audit_ID: {e_proof['audit_hash']}\nStatus: VERIFIED_BY_FBC_KERNEL", language="bash")
+    with col_2:
+        st.subheader("Asset Audit Trail")
+        st.write(f"Optimized Monthly Target: **${energy_results['new_optimized_cost']:,.2f}**")
+        
+        # --- SHA-256 Security Proof ---
+        e_proof = vault.generate_proof("PROJECT_II", dist_id, energy_results['ai_predicted_savings'])
+        st.markdown("**🛡️ Infrastructure Proof:**")
+        st.code(f"HASH: {e_proof['audit_hash']}\nSTATUS: {e_proof['status']}", language="bash")
 
+# --- Global Footer ---
 st.markdown("---")
-st.caption("FBC Digital Systems v3.6 | Proprietary Blockchain-Ready Ledger | 2026")
+st.caption("© 2026 FBC Digital Systems | Proprietary Intelligence Framework | Austin HQ & Global Nodes")
