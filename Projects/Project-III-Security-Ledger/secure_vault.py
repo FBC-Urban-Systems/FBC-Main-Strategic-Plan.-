@@ -1,39 +1,54 @@
 # ==========================================
 # PATH: Projects/Project-III-Security-Ledger/secure_vault.py
-# DESCRIPTION: Unified FBC SHA-256 Security Protocol
-# VERSION: v2.1-Gold
+# DESCRIPTION: FBC Persistent Security & Logging Engine
 # ==========================================
 
 import hashlib
-import json
-from datetime import datetime
+import datetime
+import pandas as pd
+import os
 
 class FBCSecureVault:
     def __init__(self):
-        self.ledger_id = "FBC-GLOBAL-LEDGER-2026"
-        self.standard = "SHA-256"
+        # Master Log File Path
+        self.log_file = "audit_trail_master.csv"
 
-    def generate_proof(self, project_id, city_node, amount):
-        """
-        Generates a secure hash for any transaction across the 6 projects.
-        """
-        timestamp = datetime.now().isoformat()
-        # Create a unique data string for the city-level security
-        raw_data = f"{project_id}|{city_node}|{amount}|{timestamp}|FBC_INTERNAL_KEY"
+    def generate_proof(self, project_id, client_id, value):
+        """Generates a SHA-256 hash and logs the transaction to a CSV database."""
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        secure_hash = hashlib.sha256(raw_data.encode()).hexdigest()
+        # Create a unique string for the hash
+        raw_string = f"{project_id}-{client_id}-{value}-{timestamp}"
+        secure_hash = hashlib.sha256(raw_string.encode()).hexdigest()
         
+        # Data to be logged
+        log_entry = {
+            "Timestamp": timestamp,
+            "Project": project_id,
+            "Client": client_id,
+            "Value": float(value),
+            "Hash": secure_hash
+        }
+        
+        # Persistence Logic: Save to CSV
+        try:
+            df = pd.DataFrame([log_entry])
+            if not os.path.isfile(self.log_file):
+                df.to_csv(self.log_file, index=False)
+            else:
+                df.to_csv(self.log_file, mode='a', header=False, index=False)
+            status = "LOGGED_SUCCESSFULLY"
+        except Exception as e:
+            status = f"LOGGING_ERROR: {str(e)}"
+            
         return {
-            "project": project_id,
-            "node": city_node,
-            "status": "SECURED_AND_VERIFIED",
-            "audit_hash": secure_hash.upper(),
-            "timestamp": timestamp,
-            "protocol": self.standard
+            "audit_hash": secure_hash,
+            "status": status,
+            "timestamp": timestamp
         }
 
-if __name__ == "__main__":
-    vault = FBCSecureVault()
-    # Test for Project I Revenue
-    proof = vault.generate_proof("PROJECT_I", "Austin-HQ", 5000000)
-    print(json.dumps(proof, indent=4))
+    def get_all_logs(self):
+        """Retrieves the entire transaction history."""
+        if os.path.exists(self.log_file):
+            return pd.read_csv(self.log_file)
+        return pd.DataFrame()
