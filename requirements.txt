@@ -1,8 +1,8 @@
 # ==========================================
 # PATH: /requirements.txt
 # DESCRIPTION: FBC Global OS Dependency Manifest
-# VERSION: v2.0.0-SUPREME
-# TARGET: Production / CI / Streamlit Runtime
+# VERSION: v2.1.0-SUPREME-API
+# TARGET: Production / CI / Streamlit / FastAPI Runtime
 # ==========================================
 
 # --------------------------------------------------
@@ -35,7 +35,6 @@ requests==2.31.0
 
 # --------------------------------------------------
 # AI / SIMULATION READINESS LAYER
-# (Used by Project engines when present)
 # --------------------------------------------------
 scikit-learn==1.4.1.post1
 
@@ -49,6 +48,12 @@ psutil==5.9.8
 # AUDIT & CRYPTO SUPPORT
 # --------------------------------------------------
 cryptography==42.0.5
+
+# --------------------------------------------------
+# API PRODUCTION LAYER  🚀 (NEW)
+# --------------------------------------------------
+fastapi==0.110.0
+uvicorn==0.29.0
 
 # --------------------------------------------------
 # STABILITY GUARANTEE
