@@ -1,7 +1,7 @@
 # ==========================================
 # PATH: /data_sources/population_data.py
 # DESCRIPTION: Real Population Data Connector
-# VERSION: v2.0.0-SUPREME-STABLE
+# VERSION: v2.1.0-SUPREME-FINAL
 # ==========================================
 
 import requests
@@ -10,8 +10,8 @@ BASE_URL = "https://api.worldbank.org/v2/country/{}/indicator/SP.POP.TOTL?format
 
 def fetch_population(country_code: str) -> int:
     """
-    Fetch latest population value for given country code from World Bank API.
-    Supreme-grade safe network handling.
+    Fetch latest population value from World Bank API
+    with production-grade safe request handling.
     """
 
     url = BASE_URL.format(country_code.upper())
