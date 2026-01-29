@@ -1,20 +1,58 @@
 # ==========================================
 # PATH: /requirements.txt
 # DESCRIPTION: FBC Global OS Dependency Manifest
-# VERSION: v1.0.0-Production
+# VERSION: v2.0.0-SUPREME
+# TARGET: Production / CI / Streamlit Runtime
 # ==========================================
 
-# Core Dashboard Framework
-streamlit==1.25.0
+# --------------------------------------------------
+# CORE DASHBOARD & UI
+# --------------------------------------------------
+streamlit==1.32.2
 
-# Data Processing & Simulation Engines
-pandas==2.0.3
-numpy==1.24.3
+# --------------------------------------------------
+# DATA PROCESSING & NUMERICAL ENGINES
+# --------------------------------------------------
+pandas==2.2.1
+numpy==1.26.4
 
-# Visualization & Charts
-plotly==5.15.0
-matplotlib==3.7.1
+# --------------------------------------------------
+# VISUALIZATION & ANALYTICS
+# --------------------------------------------------
+plotly==5.19.0
+matplotlib==3.8.3
 
-# Security & Utilities
-python-dotenv==1.0.0
+# --------------------------------------------------
+# DATABASE & PERSISTENCE
+# --------------------------------------------------
+sqlalchemy==2.0.28
+
+# --------------------------------------------------
+# SECURITY & ENVIRONMENT
+# --------------------------------------------------
+python-dotenv==1.0.1
 requests==2.31.0
+
+# --------------------------------------------------
+# AI / SIMULATION READINESS LAYER
+# (Used by Project engines when present)
+# --------------------------------------------------
+scikit-learn==1.4.1.post1
+
+# --------------------------------------------------
+# PERFORMANCE & SYSTEM UTILITIES
+# --------------------------------------------------
+cachetools==5.3.2
+psutil==5.9.8
+
+# --------------------------------------------------
+# AUDIT & CRYPTO SUPPORT
+# --------------------------------------------------
+cryptography==42.0.5
+
+# --------------------------------------------------
+# STABILITY GUARANTEE
+# --------------------------------------------------
+pip>=24.0
+setuptools>=69.0
+wheel>=0.42.0
