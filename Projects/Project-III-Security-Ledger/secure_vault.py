@@ -1,50 +1,49 @@
 # ==========================================
-# PATH: Projects/Project-III-Security-Ledger/secure_vault-1.py
-# DESCRIPTION: FBC High-Level Security Protocol (Project III)
-# VERSION: v3.0-Encrypted-Production
+# PATH: Projects/Project-III-Security-Ledger/secure_vault_1.py
+# DESCRIPTION: FBC Secure Ledger - Persistent Audit System
+# VERSION: v3.5-Immutable
 # ==========================================
 
 import hashlib
 import json
-from datetime import datetime
 import os
+from datetime import datetime
 
 class FBCSecureVault:
     def __init__(self):
-        self.ledger_id = "FBC-GLOBAL-LEDGER-001"
-        self.protocol = "SHA-256-SALTED"
-        # Secret Salt: This makes hashes unique and impossible to reverse-engineer.
-        # In professional setups, this is stored in a hidden .env file.
-        self._internal_salt = os.getenv("FBC_SECRET_SALT", "FBC_PROPRIETARY_RESERVE_2026")
+        self.vault_file = "fbc_master_ledger.json"
+        self._salt = os.getenv("FBC_SECRET", "GLOBAL_RESERVE_2026_PROPRIETARY")
 
-    def generate_audit_proof(self, node_id, amount_m):
-        """
-        Generates a secure, immutable digital fingerprint (Hash) for every transaction.
-        """
-        timestamp = datetime.now().isoformat()
+    def generate_audit_proof(self, node_id, amount):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Combining data with our secret salt to create a unique string
-        raw_payload = f"{node_id}|{amount_m}|{timestamp}|{self._internal_salt}"
-        
-        # Standard SHA-256 Encryption logic
-        secure_hash = hashlib.sha256(raw_payload.encode()).hexdigest()
-        
-        audit_entry = {
+        # Creating a cryptographic binding
+        raw_string = f"{node_id}{amount}{timestamp}{self._salt}"
+        secure_hash = hashlib.sha256(raw_string.encode()).hexdigest()
+
+        proof = {
             "node": node_id,
-            "verified_revenue_m": f"${amount_m}M",
+            "amount": f"${amount}M",
             "timestamp": timestamp,
-            "status": "SECURED_BY_FBC_KERNEL",
             "audit_hash": secure_hash.upper(),
-            "protocol": self.protocol
+            "status": "IMMUTABLE_RECORD"
         }
+
+        self._persist_to_ledger(proof)
+        return proof
+
+    def _persist_to_ledger(self, entry):
+        """Appends the audit proof to a permanent file (The Ledger)"""
+        ledger_data = []
+        if os.path.exists(self.vault_file):
+            with open(self.vault_file, 'r') as f:
+                try: ledger_data = json.load(f)
+                except: ledger_data = []
         
-        return audit_entry
+        ledger_data.append(entry)
+        with open(self.vault_file, 'w') as f:
+            json.dump(ledger_data, f, indent=4)
 
 if __name__ == "__main__":
-    # Test for Austin Node security
     vault = FBCSecureVault()
-    # Simulating a verified revenue of 5.2M from Austin
-    proof = vault.generate_audit_proof("Austin-HQ", 5.2)
-    
-    print("--- [FBC SECURITY] AUDIT PROOF GENERATED ---")
-    print(json.dumps(proof, indent=4))
+    print(vault.generate_audit_proof("Riyadh-Center", 12.5))
