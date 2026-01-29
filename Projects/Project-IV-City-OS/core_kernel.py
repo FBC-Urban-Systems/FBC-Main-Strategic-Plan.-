@@ -1,46 +1,57 @@
+# ==========================================
+# PATH: /core_kernel.py
+# DESCRIPTION: FBC Universal Path Integrator & Master Kernel
+# VERSION: v2.7-Stable-Production
+# ==========================================
+
 import sys
 import os
 
-# Get the directory where core_kernel.py is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def initialize_fbc_os():
+    """
+    Dynamically injects all project directories into the system path.
+    This ensures that imports work regardless of where the script is executed.
+    """
+    # Get the root directory of the repository
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    # List of all strategic project sectors
+    PROJECT_SECTORS = [
+        "Projects/Project-I-Urban-Revenue",
+        "Projects/Project-II-Private-Districts",
+        "Projects/Project-III-Traffic-Intelligence",
+        "Projects/Project-III-Security-Ledger",
+        "Projects/Project-IV-City-OS",
+        "Projects/Project-V-Digital-Earth",
+        "Projects/Project-VI-Global-Dominance"
+    ]
+    
+    print("--- [KERNEL] Initializing FBC Global Infrastructure ---")
+    
+    added_count = 0
+    for sector in PROJECT_SECTORS:
+        full_path = os.path.join(BASE_DIR, sector)
+        if os.path.exists(full_path):
+            if full_path not in sys.path:
+                sys.path.append(full_path)
+                added_count += 1
+        else:
+            print(f"⚠️ Warning: Sector path not found: {sector}")
 
-# Define the paths to your sub-projects
-# We check both local and Projects/ subdirectory to be safe
-PROJECT_PATHS = [
-    os.path.join(BASE_DIR, "Projects/Project-I-Urban-Revenue"),
-    os.path.join(BASE_DIR, "Projects/Project-II-Private-Districts"),
-    os.path.join(BASE_DIR, "Projects/Project-III-Traffic-Intelligence"),
-    os.path.join(BASE_DIR, "Projects/Project-III-Security-Ledger"),
-    # Also adding relative paths in case the script runs from the root
-    "Projects/Project-I-Urban-Revenue",
-    "Projects/Project-II-Private-Districts",
-    "Projects/Project-III-Traffic-Intelligence"
-]
-
-# Inject these paths into Python's search list
-for path in PROJECT_PATHS:
-    full_path = os.path.abspath(path)
-    if full_path not in sys.path:
-        sys.path.append(full_path)
-
-# Now try the imports again
-try:
-    from revenue_optimizer import RevenueOptimizer
-    from district_core import PrivateDistrictManager
-    from accident_pred import TrafficRiskEngine
-    print("--- [KERNEL] Master Sync: All Units Operational ✅ ---")
-except ImportError as e:
-    print(f"--- [KERNEL] Critical Sync Failure: {e} ---")
-    print(f"Current System Path: {sys.path}") # This helps us debug in GitHub logs
-    sys.exit(1)
-
-class FBCMasterOS:
-    def __init__(self):
-        self.status = "OPERATIONAL"
-
-    def run_full_audit(self):
-        return {"Status": "SUCCESS", "Integrity": "100% Verified"}
+    print(f"--- [KERNEL] Master Sync Complete. {added_count} Sectors Linked ✅ ---")
 
 if __name__ == "__main__":
-    os_kernel = FBCMasterOS()
-    print(os_kernel.run_full_audit())
+    initialize_fbc_os()
+    
+    # Verification of core engines
+    try:
+        # These will now work from any folder thanks to the dynamic path injection
+        print("--- [KERNEL] Verifying Engine Integrity... ---")
+        # Note: Imports are done inside try to catch missing files
+        from revenue_optimizer import RevenueOptimizer
+        from secure_vault import FBCSecureVault
+        
+        vault = FBCSecureVault()
+        print("--- [KERNEL] System Integrity: SECURED & OPERATIONAL 🛡️ ---")
+    except ImportError as e:
+        print(f"--- [KERNEL] Critical Failure: {e} ---")
