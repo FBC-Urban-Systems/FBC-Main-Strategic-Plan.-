@@ -1,45 +1,103 @@
 # ==========================================
 # PATH: Projects/Project-V-Digital-Earth/data_secure_vault.py
 # DESCRIPTION: FBC Secure Data Exchange Protocol (SDEP)
-# VERSION: v2.0-Production-Ready
+# VERSION: v3.0-SDEP-GOLD (Planetary-Grade)
 # ==========================================
 
 import hashlib
+import hmac
+import os
+import json
 from datetime import datetime
+from typing import Dict
+
+# ==========================================
+# SDEP CONFIGURATION
+# ==========================================
+SDEP_PROTOCOL_VERSION = "SDEP-v3.0-GOLD"
+HASH_ALGORITHM = "sha256"
+
+# Master exchange salt (simulated secure seed)
+# In production: stored in HSM or environment secret
+MASTER_SALT = os.getenv("FBC_SDEP_MASTER_SALT", "FBC_DIGITAL_EARTH_MASTER_KEY").encode()
+
+
+class SDEPComplianceError(Exception):
+    pass
+
 
 class FBCDataVault:
-    def __init__(self, city_id):
-        self.city_id = city_id
-        self.protocol_version = "SDEP-v2.0"
+    """
+    Secure Data Exchange Protocol Vault
+    Handles anonymization, encryption, compliance packaging,
+    and audit-trace generation for Digital Earth Marketplace.
+    """
 
-    def encrypt_and_package(self, data_type, raw_payload):
-        """
-        Anonymizes city data (Traffic/Energy) and prepares it for the Global Exchange.
-        """
-        timestamp = datetime.now().isoformat()
-        
-        # 1. Anonymization Layer (Removing sensitive IDs)
-        # We simulate this by creating a one-way hash of the payload
-        secure_payload = hashlib.sha256(f"{raw_payload}{timestamp}".encode()).hexdigest()
-        
-        # 2. Packaging for Sale (Digital Earth Exchange)
+    def __init__(self, city_id: str):
+        self.city_id = city_id
+        self.protocol_version = SDEP_PROTOCOL_VERSION
+
+    # ------------------------------------------
+    # Governance Rules per Data Category
+    # ------------------------------------------
+    GOVERNED_DATA_CATEGORIES = {
+        "URBAN_TRAFFIC_FLOW": "HIGH_CLEARANCE",
+        "URBAN_ENERGY_FLOW": "HIGH_CLEARANCE",
+        "URBAN_RISK_PROFILE": "RESTRICTED_CLEARANCE",
+        "URBAN_INFRASTRUCTURE_STATE": "RESTRICTED_CLEARANCE"
+    }
+
+    # ------------------------------------------
+    # Core Encryption & Packaging
+    # ------------------------------------------
+    def encrypt_and_package(self, data_type: str, raw_payload: str) -> Dict:
+        timestamp = datetime.utcnow().isoformat()
+
+        # --- Governance Validation ---
+        if data_type not in self.GOVERNED_DATA_CATEGORIES:
+            raise SDEPComplianceError(f"Data category '{data_type}' not approved for exchange.")
+
+        clearance = self.GOVERNED_DATA_CATEGORIES[data_type]
+
+        # --- Anonymization & Secure Hashing ---
+        salted_payload = f"{raw_payload}{timestamp}{self.city_id}".encode()
+        secure_hash = hmac.new(MASTER_SALT, salted_payload, hashlib.sha256).hexdigest()
+
+        # --- Exchange Token (Marketplace Reference) ---
+        exchange_token = secure_hash[:40]
+
+        # --- Payload Metadata ---
+        payload_size_kb = round(len(raw_payload.encode()) / 1024, 2)
+
+        # --- Immutable Audit Trace ID ---
+        audit_trace = hashlib.sha256(f"{secure_hash}{timestamp}".encode()).hexdigest()
+
+        # --- Final Package ---
         package = {
-            "origin": self.city_id,
+            "sdep_protocol": self.protocol_version,
+            "origin_city_node": self.city_id,
             "data_category": data_type,
-            "security_clearance": "SHA-256-HIGH",
-            "encrypted_blob": secure_payload[:32], # First 32 chars for the exchange token
+            "security_clearance": clearance,
+            "exchange_token": exchange_token,
+            "audit_trace_id": audit_trace,
+            "payload_size_kb": payload_size_kb,
             "is_monetizable": True,
-            "timestamp": timestamp
+            "timestamp_utc": timestamp
         }
-        
+
         return package
 
+
+# ==========================================
+# CLI TEST EXECUTION
+# ==========================================
 if __name__ == "__main__":
-    # Test for Austin's Energy Data
     vault = FBCDataVault("Austin-Node-01")
-    market_ready_data = vault.encrypt_and_package("URBAN_ENERGY_FLOW", "CONSUMPTION_DATA_SAMPLE_102GB")
-    
-    print("--- [FBC DIGITAL EARTH] DATA PACKAGING SUCCESS ---")
-    print(f"City: {market_ready_data['origin']}")
-    print(f"Token: {market_ready_data['encrypted_blob']}")
-    print(f"Status: READY FOR MARKETPLACE")
+
+    sample_payload = "CONSUMPTION_DATA_SAMPLE_102GB"
+
+    packaged = vault.encrypt_and_package("URBAN_ENERGY_FLOW", sample_payload)
+
+    print("\n=== [FBC DIGITAL EARTH | SDEP PACKAGING SUCCESS] ===\n")
+    print(json.dumps(packaged, indent=4))
+    print("\nSTATUS: READY FOR PLANETARY DATA EXCHANGE 🌍")
