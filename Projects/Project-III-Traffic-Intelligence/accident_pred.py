@@ -1,100 +1,53 @@
 # ==========================================
-# PATH: Projects/Project-III-Traffic-Intelligence/accident_pred.py
-# DESCRIPTION: FBC Urban Traffic Risk Intelligence Engine
-# VERSION: v4.0-URBAN-RISK-AI-GRADE
+# PATH: /Projects/Project_III_Traffic_Intelligence/accident_pred.py
+# DESCRIPTION: Traffic Risk Intelligence Engine
+# VERSION: v2.0.0-RISK-MODEL
+# ROLE: Realistic Urban Traffic Risk Prediction
 # ==========================================
 
 import random
-from datetime import datetime
+import math
 
 class TrafficRiskEngine:
-    """
-    FBC AI Traffic Risk Engine
-    Simulates live weather + density-based accident probability scoring
-    Ready for real API integration.
-    """
-
-    def __init__(self, city_name):
+    def __init__(self, city_name: str):
         self.city = city_name
-        self.base_risk = 12.0
-        self.engine_version = "TRAFFIC-AI-v4.0"
 
-    # --------------------------------------
-    # WEATHER PROVIDER LAYER
-    # --------------------------------------
-    def get_live_weather(self):
+    def analyze_real_time_risk(self, traffic_density: int):
         """
-        Simulated Live Weather Feed.
-        Can be replaced later with real API call without changing core logic.
-        """
-        weather_states = ["Clear", "Cloudy", "Rainy", "Foggy", "Stormy"]
-        return random.choice(weather_states)
-
-    # --------------------------------------
-    # CORE RISK ANALYSIS
-    # --------------------------------------
-    def analyze_real_time_risk(self, vehicle_density):
-        """
-        Calculates real-time traffic accident risk score.
-        Density input range expected: 0 → 300
+        Computes realistic traffic risk score based on density,
+        stochastic weather impact, and time fluctuation.
         """
 
-        weather = self.get_live_weather()
+        # Normalize density impact
+        density_factor = min(traffic_density / 300, 1.0)
 
-        # Weather impact multipliers
-        weather_multiplier = {
-            "Clear": 1.0,
-            "Cloudy": 1.2,
-            "Rainy": 1.6,
-            "Foggy": 2.1,
-            "Stormy": 2.8
-        }
+        # Weather randomness (0 = clear, 1 = storm)
+        weather_factor = random.uniform(0.0, 1.0)
 
-        multiplier = weather_multiplier.get(weather, 1.0)
+        # Time-of-day risk curve (simulated sine wave)
+        time_factor = abs(math.sin(random.uniform(0, math.pi)))
 
-        # Core AI-inspired risk formula
-        raw_score = (vehicle_density * 0.65 * multiplier) + self.base_risk
-
-        # Normalize to 0–100 scale
-        risk_score = min(round(raw_score, 2), 100.0)
-
-        # Status classification
-        if risk_score < 40:
-            status = "LOW_RISK"
-        elif risk_score < 70:
-            status = "ELEVATED"
-        elif risk_score < 90:
-            status = "HIGH_RISK"
-        else:
-            status = "CRITICAL"
-
-        return {
-            "city": self.city,
-            "timestamp": datetime.now().isoformat(),
-            "engine_version": self.engine_version,
-            "live_weather": weather,
-            "vehicle_density": vehicle_density,
-            "risk_score": risk_score,   # numeric clean value
-            "risk_percent": f"{risk_score}%",
-            "status": status
-        }
-
-# --------------------------------------
-# STANDALONE ENGINE TEST
-# --------------------------------------
-if __name__ == "__main__":
-    print("\n--- FBC TRAFFIC INTELLIGENCE TEST ---")
-
-    engine = TrafficRiskEngine("Austin-TX")
-
-    for density in [50, 120, 200, 280]:
-        result = engine.analyze_real_time_risk(density)
-        print(
-            f"City: {result['city']} | "
-            f"Density: {density} | "
-            f"Weather: {result['live_weather']} | "
-            f"Risk: {result['risk_percent']} | "
-            f"Status: {result['status']}"
+        # Combined weighted risk score
+        raw_risk = (
+            (density_factor * 0.5) +
+            (weather_factor * 0.3) +
+            (time_factor * 0.2)
         )
 
-    print("--- TRAFFIC AI OPERATIONAL ✅ ---\n")
+        # Scale to 0–100
+        risk_score = round(raw_risk * 100, 2)
+
+        # Human-readable weather state
+        if weather_factor < 0.3:
+            weather_state = "Clear"
+        elif weather_factor < 0.7:
+            weather_state = "Rain"
+        else:
+            weather_state = "Storm"
+
+        return {
+            "City": self.city,
+            "risk_score": risk_score,
+            "live_weather": weather_state,
+            "traffic_density": traffic_density
+        }
