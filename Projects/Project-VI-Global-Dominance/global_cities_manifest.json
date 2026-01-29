@@ -1,31 +1,68 @@
 {
-  "fbc_global_network": {
-    "total_target_cities": 80,
-    "hq_node": "Austin, Texas",
-    "deployment_schedule": {
-      "phase_1_north_america": {
-        "years": "2027-2029",
-        "primary_hubs": ["Austin", "Miami", "Toronto", "New York", "Vancouver"],
-        "target_revenue_per_hub_usd_m": 45,
-        "status": "ready_for_pilot"
-      },
-      "phase_2_mena_asean": {
-        "years": "2030-2031",
-        "primary_hubs": ["Dubai", "Riyadh", "Singapore", "Doha", "Abu Dhabi"],
-        "target_revenue_per_hub_usd_m": 60,
-        "status": "strategic_alignment"
-      },
-      "phase_3_global_scale": {
-        "years": "2032-2037",
-        "primary_hubs": ["London", "Berlin", "Tokyo", "Paris", "Seoul"],
-        "target_revenue_per_hub_usd_m": 55,
-        "status": "expansion_model"
-      }
+  "system_metadata": {
+    "project_name": "FBC Global Strategic Plan",
+    "version": "2.2.0",
+    "last_updated": "2026-01-29",
+    "author": "Karim - FBC Founder"
+  },
+  "financial_model_v2": {
+    "series_a_valuation_target_usd_b": 1.2,
+    "seed_funding_ask_usd_m": 5.0,
+    "projected_arr_2027_usd_m": 15.0,
+    "unit_economics": {
+      "ltv_cac_ratio": 40.2,
+      "gross_margin_percent": 82.0,
+      "payback_period_months": 5.5,
+      "churn_rate_target_percent": 2.5
     },
-    "technical_protocols": {
-      "encryption": "SHA-256-FBC-GOLD",
-      "os_kernel": "v2.1-Master",
-      "data_privacy": "GDPR-COMPLIANT"
-    }
+    "revenue_streams": [
+      {
+        "stream": "City-OS Licensing",
+        "contribution_percent": 45
+      },
+      {
+        "stream": "Urban Data Monetization",
+        "contribution_percent": 35
+      },
+      {
+        "stream": "Private District Management",
+        "contribution_percent": 20
+      }
+    ],
+    "expansion_nodes": [
+      {
+        "city": "Austin",
+        "region": "North America",
+        "status": "HQ / Operational",
+        "expected_revenue_m": 5.2,
+        "phase": 1
+      },
+      {
+        "city": "Dubai",
+        "region": "MENA",
+        "status": "Strategic Hub",
+        "expected_revenue_m": 8.5,
+        "phase": 1
+      },
+      {
+        "city": "Riyadh",
+        "region": "MENA",
+        "status": "Strategic Hub",
+        "expected_revenue_m": 12.0,
+        "phase": 2
+      },
+      {
+        "city": "Singapore",
+        "region": "ASEAN",
+        "status": "Expansion Node",
+        "expected_revenue_m": 10.5,
+        "phase": 2
+      }
+    ]
+  },
+  "technical_compliance": {
+    "security_protocol": "SHA-256-FBC-GOLD",
+    "audit_status": "PASSED",
+    "data_privacy": "GDPR/SDEP Compliant"
   }
 }
