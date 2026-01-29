@@ -1,105 +1,137 @@
-# =====================================================
-# FBC URBAN AI – FIRST PUBLIC WEB APP MVP
-# Simple Revenue & Energy Simulation Interface
-# =====================================================
+# ==========================================
+# PATH: /app.py
+# DESCRIPTION: FBC Global Command Center
+# VERSION: v5.0.0 DATA-CORE-INTEGRATED
+# ==========================================
 
 import streamlit as st
+import sys, os, datetime
+import pandas as pd
 
-# Import AI Engines
-from Projects.Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
-from Projects.Project_II_Private_Districts.energy_forecast import EnergyForecaster
+# ==========================================
+# PATH INTEGRATION
+# ==========================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECTS_PATH = os.path.join(BASE_DIR, "Projects")
+sys.path.append(PROJECTS_PATH)
 
-# -----------------------------------------------------
-# Page Configuration
-# -----------------------------------------------------
-st.set_page_config(
-    page_title="FBC Urban AI Simulator",
-    page_icon="🏙️",
-    layout="centered"
+# ==========================================
+# IMPORT ENGINES
+# ==========================================
+from Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
+from Project_II_Private_Districts.energy_forecast import predict_energy_savings
+from Project_III_Traffic_Intelligence.accident_pred import TrafficRiskEngine
+from Project_III_Security_Ledger.secure_vault import FBCSecureVault
+
+# ==========================================
+# DATA CORE
+# ==========================================
+from data_core import fetch_all_results, store_simulation_result
+
+vault = FBCSecureVault()
+
+# ==========================================
+# STREAMLIT CONFIG
+# ==========================================
+st.set_page_config(page_title="FBC Global Command Center", layout="wide")
+
+st.title("🌍 FBC Global Command Center")
+st.caption("Planetary Urban Intelligence Dashboard")
+
+st.markdown("---")
+
+# ==========================================
+# SIDEBAR MODE SELECT
+# ==========================================
+mode = st.sidebar.radio(
+    "Select Operation Mode",
+    ["Run New Simulation", "Global Oversight Ledger"]
 )
 
-# -----------------------------------------------------
-# Header
-# -----------------------------------------------------
-st.title("🏙️ FBC Urban AI Simulator")
-st.markdown("""
-**First Public AI Prototype of FBC Urban Systems**  
-Simulate **City Revenue Optimization** and **Energy Forecasting** in real-time.
-""")
+# ==========================================
+# MODE 1 — RUN NEW SIMULATION
+# ==========================================
+if mode == "Run New Simulation":
 
-st.divider()
+    st.header("🚀 Run City AI Simulation")
 
-# -----------------------------------------------------
-# User Inputs
-# -----------------------------------------------------
-city = st.text_input("🌍 City Name", "Cairo")
+    col1, col2, col3 = st.columns(3)
 
-population = st.number_input(
-    "👥 Population",
-    min_value=100000,
-    max_value=50000000,
-    value=5000000,
-    step=100000
-)
+    with col1:
+        city = st.text_input("City Name", "Cairo")
 
-energy_price = st.number_input(
-    "⚡ Energy Price per kWh ($)",
-    min_value=0.01,
-    max_value=1.00,
-    value=0.12,
-    step=0.01
-)
+    with col2:
+        base_revenue = st.number_input("Base Annual Revenue ($)", value=5_000_000)
 
-# -----------------------------------------------------
-# Run Simulation Button
-# -----------------------------------------------------
-run = st.button("🚀 Run Simulation")
+    with col3:
+        base_energy_bill = st.number_input("Base Monthly Energy Bill ($)", value=150_000)
 
-# -----------------------------------------------------
-# Simulation Logic
-# -----------------------------------------------------
-if run:
-    with st.spinner("Running AI Simulation..."):
+    traffic_density = st.slider("Traffic Density Index", 50, 300, 150)
 
-        revenue_engine = RevenueOptimizer()
-        energy_engine = EnergyForecaster()
+    if st.button("Run Simulation"):
 
-        projected_revenue = revenue_engine.simulate(city, population)
-        projected_energy_cost = energy_engine.forecast(city, population, energy_price)
+        with st.spinner("Executing AI Engines..."):
 
-    st.success("Simulation Completed Successfully ✅")
+            # Run Engines
+            rev_engine = RevenueOptimizer(city)
+            rev_result = rev_engine.project_incremental_gain(base_revenue)
 
-    st.divider()
+            energy_result = predict_energy_savings(base_energy_bill)
 
-    col1, col2 = st.columns(2)
+            traffic_engine = TrafficRiskEngine(city)
+            traffic_result = traffic_engine.analyze_real_time_risk(traffic_density)
 
-    col1.metric(
-        label="💰 Projected Annual Revenue ($)",
-        value=f"{projected_revenue:,.0f}"
-    )
+            revenue_gain = rev_result["Total_City_Gain"]
+            energy_savings = energy_result["ai_predicted_savings"]
+            risk_score = traffic_result["risk_score"]
 
-    col2.metric(
-        label="🔋 Projected Annual Energy Cost ($)",
-        value=f"{projected_energy_cost:,.0f}"
-    )
+            # Store in Data Core
+            store_simulation_result(city, revenue_gain, energy_savings, risk_score)
 
-    st.divider()
+            # Generate Ledger Proof
+            proof = vault.generate_proof("SIMULATION", city, revenue_gain)
 
-    st.markdown("### 📊 AI Interpretation")
+        st.success("Simulation Completed Successfully")
 
-    st.write(f"""
-For **{city}**, with a population of **{population:,}**,  
-the FBC AI projects an optimized annual revenue of  
-**${projected_revenue:,.0f}**
+        colA, colB, colC = st.columns(3)
 
-and an estimated annual energy operational cost of  
-**${projected_energy_cost:,.0f}**.
-""")
+        colA.metric("Revenue Gain ($)", f"{revenue_gain:,.2f}")
+        colB.metric("Energy Savings ($)", f"{energy_savings:,.2f}")
+        colC.metric("Traffic Risk Score", f"{risk_score}")
 
-    st.info("🔒 This is an MVP prototype. Payment & PDF reports will be added next.")
+        st.markdown("### 🔐 Ledger Proof")
+        st.code(f"Audit Hash: {proof['audit_hash']}\nStatus: {proof['status']}")
 
-# -----------------------------------------------------
-# Footer
-# -----------------------------------------------------
-st.divider()
-st.caption("© 2026 FBC Urban Systems – AI for Next Generation Cities")
+# ==========================================
+# MODE 2 — GLOBAL OVERSIGHT
+# ==========================================
+else:
+
+    st.header("🛰️ Global Oversight Console")
+
+    data_rows = fetch_all_results()
+
+    if data_rows:
+
+        df = pd.DataFrame(data_rows, columns=[
+            "ID","Timestamp","City","Revenue Gain","Energy Savings","Risk Score"
+        ])
+
+        total_revenue = df["Revenue Gain"].sum()
+        total_savings = df["Energy Savings"].sum()
+
+        colx, coly = st.columns(2)
+        colx.metric("Total Simulated Revenue Gain", f"${total_revenue:,.2f}")
+        coly.metric("Total Simulated Energy Savings", f"${total_savings:,.2f}")
+
+        st.subheader("Simulation History")
+        st.dataframe(df, use_container_width=True)
+
+    else:
+        st.info("No simulation data found. Run a simulation first.")
+
+# ==========================================
+# FOOTER
+# ==========================================
+st.markdown("---")
+st.caption("© 2026 FBC Digital Systems | Global Urban Intelligence OS")
