@@ -1,41 +1,78 @@
 # ==========================================
 # PATH: Projects/Project-I-Urban-Revenue/ai_engine_v2.py
-# DESCRIPTION: FBC Proprietary Revenue AI (Linked to Strategy)
-# VERSION: v2.2-Alpha-Release
+# DESCRIPTION: FBC AI Engine - Manifest-Driven Revenue Optimization
+# VERSION: v2.7-Stable (Production Ready)
 # ==========================================
 
-import numpy as np
 import json
+import os
+import numpy as np
 from datetime import datetime
 
 class UrbanRevenueAI:
-    def __init__(self, city_name, maturity_index=0.8):
-        self.city = city_name
-        self.maturity = maturity_index
-        self.boost_factor = 0.25 # The 25% FBC Standard from PDF
+    def __init__(self, city_name):
+        self.city_name = city_name
+        self.boost_factor = 0.25  # FBC Standard 25% Optimization Boost
+        self.manifest_data = self._load_city_data()
 
-    def analyze_yield(self, base_value_m):
+    def _load_city_data(self):
         """
-        Predicts revenue boost based on FBC Strategic Plan logic.
+        Dynamically pulls city financial data from the global manifest.
         """
-        # Logic: High maturity cities (like Austin) get more precise boosts
-        dynamic_boost = self.boost_factor * self.maturity
+        # Try to find the manifest in the root directory
+        manifest_path = os.path.join(os.getcwd(), 'global_cities_manifest.json')
         
-        # Add 'Market Volatility' to make the simulation realistic for investors
-        volatility = np.random.uniform(-0.02, 0.05)
-        final_gain_percent = dynamic_boost + volatility
+        try:
+            with open(manifest_path, 'r') as f:
+                data = json.load(f)
+                nodes = data.get('financial_model_v2', {}).get('expansion_nodes', [])
+                for node in nodes:
+                    if node['city'].lower() == self.city_name.lower():
+                        return node
+            return None
+        except Exception as e:
+            print(f"--- [ERROR] Manifest Load Failure: {e} ---")
+            return None
+
+    def analyze_yield(self):
+        """
+        Calculates optimized revenue based on real manifest values.
+        """
+        if not self.manifest_data:
+            return {"error": f"City '{self.city_name}' data not found in Manifest."}
+
+        # Real value from your JSON file
+        base_revenue = self.manifest_data['expected_revenue_m']
         
-        optimized_total = base_value_m * (1 + final_gain_percent)
-        net_profit = optimized_total - base_value_m
+        # Adding a bit of AI 'Smart' variance (simulating market conditions)
+        market_variance = np.random.uniform(-0.02, 0.05)
+        total_boost = self.boost_factor + market_variance
         
+        optimized_total = base_revenue * (1 + total_boost)
+        net_profit_gain = optimized_total - base_revenue
+
         return {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "city_node": self.city,
-            "security_token": "FBC-VERIFIED-SHA256",
-            "metrics": {
-                "base_value_m": f"${base_value_m:,.2f}M",
-                "ai_boost_percent": f"{final_gain_percent*100:.2f}%",
-                "net_profit_increase_m": f"${net_profit:,.2f}M",
-                "final_optimized_yield_m": f"${optimized_total:,.2f}M"
+            "city": self.city_name,
+            "status": self.manifest_data['status'],
+            "analysis": {
+                "original_revenue_m": f"${base_revenue}M",
+                "ai_boost_applied": f"{total_boost*100:.2f}%",
+                "fbc_target_revenue_m": f"${optimized_total:.2f}M",
+                "net_value_created_m": f"${net_profit_gain:.2f}M"
             }
         }
+
+if __name__ == "__main__":
+    # Test Run using 'Dubai' from your manifest
+    engine = UrbanRevenueAI("Dubai")
+    report = engine.analyze_yield()
+    
+    print("--- [FBC AI REVENUE ENGINE REPORT] ---")
+    if "error" in report:
+        print(report["error"])
+    else:
+        print(f"Targeting City: {report['city']}")
+        print(f"Base Revenue: {report['analysis']['original_revenue_m']}")
+        print(f"AI Optimized: {report['analysis']['fbc_target_revenue_m']}")
+        print(f"Net Gain: {report['analysis']['net_value_created_m']}")
