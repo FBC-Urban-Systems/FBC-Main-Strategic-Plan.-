@@ -1,57 +1,104 @@
 # ==========================================
-# PATH: /core_kernel.py
-# DESCRIPTION: FBC Universal Path Integrator & Master Kernel
-# VERSION: v2.7-Stable-Production
+# PATH: Projects/Project-IV-City-OS/core_kernel.py
+# DESCRIPTION: FBC Universal Master Kernel & Path Orchestrator
+# VERSION: v3.5-UNIVERSAL-GRADE
 # ==========================================
 
 import sys
 import os
+import json
+from pathlib import Path
+from datetime import datetime
 
-def initialize_fbc_os():
+# ==========================================
+# KERNEL CONFIG
+# ==========================================
+KERNEL_VERSION = "FBC_KERNEL_v3.5"
+EXPECTED_PROJECT_FOLDERS = [
+    "Project-I-Urban-Revenue",
+    "Project-II-Private-Districts",
+    "Project-III-Traffic-Intelligence",
+    "Project-III-Security-Ledger",
+    "Project-IV-City-OS",
+    "Project-V-Digital-Earth",
+    "Project-VI-Global-Dominance"
+]
+
+# ==========================================
+# CORE KERNEL CLASS
+# ==========================================
+class FBCKernel:
     """
-    Dynamically injects all project directories into the system path.
-    This ensures that imports work regardless of where the script is executed.
+    Universal Master Kernel:
+    - Auto-discovers project sectors
+    - Injects them into PYTHONPATH safely
+    - Performs integrity verification
+    - Outputs structured audit-ready status
     """
-    # Get the root directory of the repository
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    
-    # List of all strategic project sectors
-    PROJECT_SECTORS = [
-        "Projects/Project-I-Urban-Revenue",
-        "Projects/Project-II-Private-Districts",
-        "Projects/Project-III-Traffic-Intelligence",
-        "Projects/Project-III-Security-Ledger",
-        "Projects/Project-IV-City-OS",
-        "Projects/Project-V-Digital-Earth",
-        "Projects/Project-VI-Global-Dominance"
-    ]
-    
-    print("--- [KERNEL] Initializing FBC Global Infrastructure ---")
-    
-    added_count = 0
-    for sector in PROJECT_SECTORS:
-        full_path = os.path.join(BASE_DIR, sector)
-        if os.path.exists(full_path):
-            if full_path not in sys.path:
-                sys.path.append(full_path)
-                added_count += 1
+
+    def __init__(self):
+        self.base_dir = Path(__file__).resolve().parents[2]
+        self.kernel_status = {
+            "kernel_version": KERNEL_VERSION,
+            "timestamp_utc": datetime.utcnow().isoformat(),
+            "base_directory": str(self.base_dir),
+            "linked_sectors": [],
+            "missing_sectors": [],
+            "engine_integrity": {},
+            "final_status": "INITIALIZING"
+        }
+
+    # --------------------------------------
+    # PATH DISCOVERY & INJECTION
+    # --------------------------------------
+    def initialize_paths(self):
+        for folder in EXPECTED_PROJECT_FOLDERS:
+            sector_path = self.base_dir / "Projects" / folder
+            if sector_path.exists():
+                if str(sector_path) not in sys.path:
+                    sys.path.append(str(sector_path))
+                self.kernel_status["linked_sectors"].append(folder)
+            else:
+                self.kernel_status["missing_sectors"].append(folder)
+
+    # --------------------------------------
+    # ENGINE INTEGRITY CHECK
+    # --------------------------------------
+    def verify_engines(self):
+        checks = {
+            "RevenueOptimizer": "revenue_optimizer",
+            "TrafficRiskEngine": "accident_pred",
+            "FBCSecureVault": "secure_vault",
+            "FBCDataVault": "data_secure_vault",
+            "FBCPlanetaryGrowthEngine": "global_expansion_sim"
+        }
+
+        for engine_name, module_name in checks.items():
+            try:
+                __import__(module_name)
+                self.kernel_status["engine_integrity"][engine_name] = "OK"
+            except Exception as e:
+                self.kernel_status["engine_integrity"][engine_name] = f"ERROR: {str(e)}"
+
+    # --------------------------------------
+    # FINALIZE STATUS
+    # --------------------------------------
+    def finalize(self):
+        if self.kernel_status["missing_sectors"]:
+            self.kernel_status["final_status"] = "PARTIAL_SYNC"
         else:
-            print(f"⚠️ Warning: Sector path not found: {sector}")
+            self.kernel_status["final_status"] = "FULLY_OPERATIONAL"
 
-    print(f"--- [KERNEL] Master Sync Complete. {added_count} Sectors Linked ✅ ---")
+        return self.kernel_status
 
+# ==========================================
+# CLI EXECUTION
+# ==========================================
 if __name__ == "__main__":
-    initialize_fbc_os()
-    
-    # Verification of core engines
-    try:
-        # These will now work from any folder thanks to the dynamic path injection
-        print("--- [KERNEL] Verifying Engine Integrity... ---")
-        # Note: Imports are done inside try to catch missing files
-        from revenue_optimizer import RevenueOptimizer
-        from secure_vault import FBCSecureVault
-        
-        vault = FBCSecureVault()
-        print("--- [KERNEL] System Integrity: SECURED & OPERATIONAL 🛡️ ---")
-    except ImportError as e:
-        print(f"--- [KERNEL] Critical Failure: {e} ---")
+    kernel = FBCKernel()
+    kernel.initialize_paths()
+    kernel.verify_engines()
+    status = kernel.finalize()
+
+    print("\n=== [FBC MASTER KERNEL INITIALIZATION] ===\n")
+    print(json.dumps(status, indent=4))
