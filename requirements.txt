@@ -1,12 +1,67 @@
 # ==========================================
-# FBC Urban AI MVP - Minimal Stable Runtime
-# STEP 3: First Public Web App Dependencies
+# FBC GLOBAL INTELLIGENCE PLATFORM
+# FULL REAL-DATA + PHASE III RUNTIME
+# VERSION: v3.0.0-STABLE
 # ==========================================
 
+# -------------------------------
+# UI & WEB DASHBOARD
+# -------------------------------
 streamlit==1.32.2
 
+# -------------------------------
+# DATA PROCESSING
+# -------------------------------
 pandas==2.2.1
 numpy==1.26.4
 
+# -------------------------------
+# VISUALIZATION
+# -------------------------------
 plotly==5.19.0
 matplotlib==3.8.3
+
+# -------------------------------
+# HTTP REQUESTS (Real Data APIs)
+# -------------------------------
+requests==2.31.0
+
+# -------------------------------
+# DATABASE / STORAGE
+# -------------------------------
+sqlalchemy==2.0.28
+
+# -------------------------------
+# API KERNEL (FastAPI)
+# -------------------------------
+fastapi==0.110.0
+uvicorn==0.29.0
+
+# -------------------------------
+# SECURITY & CRYPTO
+# -------------------------------
+cryptography==42.0.5
+python-dotenv==1.0.1
+
+# -------------------------------
+# SYSTEM UTILITIES
+# -------------------------------
+cachetools==5.3.2
+psutil==5.9.8
+
+# -------------------------------
+# AI / ML READY
+# -------------------------------
+scikit-learn==1.4.1.post1
+
+# -------------------------------
+# PDF REPORT ENGINE  (PHASE III)
+# -------------------------------
+reportlab==4.1.0
+
+# -------------------------------
+# BUILD STABILITY
+# -------------------------------
+pip>=24.0
+setuptools>=69.0
+wheel>=0.42.0
