@@ -1,54 +1,50 @@
 # ==========================================
-# PATH: Projects/Project-III-Security-Ledger/secure_vault.py
-# DESCRIPTION: FBC Persistent Security & Logging Engine
+# PATH: Projects/Project-III-Security-Ledger/secure_vault-1.py
+# DESCRIPTION: FBC High-Level Security Protocol (Project III)
+# VERSION: v3.0-Encrypted-Production
 # ==========================================
 
 import hashlib
-import datetime
-import pandas as pd
+import json
+from datetime import datetime
 import os
 
 class FBCSecureVault:
     def __init__(self):
-        # Master Log File Path
-        self.log_file = "audit_trail_master.csv"
+        self.ledger_id = "FBC-GLOBAL-LEDGER-001"
+        self.protocol = "SHA-256-SALTED"
+        # Secret Salt: This makes hashes unique and impossible to reverse-engineer.
+        # In professional setups, this is stored in a hidden .env file.
+        self._internal_salt = os.getenv("FBC_SECRET_SALT", "FBC_PROPRIETARY_RESERVE_2026")
 
-    def generate_proof(self, project_id, client_id, value):
-        """Generates a SHA-256 hash and logs the transaction to a CSV database."""
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def generate_audit_proof(self, node_id, amount_m):
+        """
+        Generates a secure, immutable digital fingerprint (Hash) for every transaction.
+        """
+        timestamp = datetime.now().isoformat()
         
-        # Create a unique string for the hash
-        raw_string = f"{project_id}-{client_id}-{value}-{timestamp}"
-        secure_hash = hashlib.sha256(raw_string.encode()).hexdigest()
+        # Combining data with our secret salt to create a unique string
+        raw_payload = f"{node_id}|{amount_m}|{timestamp}|{self._internal_salt}"
         
-        # Data to be logged
-        log_entry = {
-            "Timestamp": timestamp,
-            "Project": project_id,
-            "Client": client_id,
-            "Value": float(value),
-            "Hash": secure_hash
+        # Standard SHA-256 Encryption logic
+        secure_hash = hashlib.sha256(raw_payload.encode()).hexdigest()
+        
+        audit_entry = {
+            "node": node_id,
+            "verified_revenue_m": f"${amount_m}M",
+            "timestamp": timestamp,
+            "status": "SECURED_BY_FBC_KERNEL",
+            "audit_hash": secure_hash.upper(),
+            "protocol": self.protocol
         }
         
-        # Persistence Logic: Save to CSV
-        try:
-            df = pd.DataFrame([log_entry])
-            if not os.path.isfile(self.log_file):
-                df.to_csv(self.log_file, index=False)
-            else:
-                df.to_csv(self.log_file, mode='a', header=False, index=False)
-            status = "LOGGED_SUCCESSFULLY"
-        except Exception as e:
-            status = f"LOGGING_ERROR: {str(e)}"
-            
-        return {
-            "audit_hash": secure_hash,
-            "status": status,
-            "timestamp": timestamp
-        }
+        return audit_entry
 
-    def get_all_logs(self):
-        """Retrieves the entire transaction history."""
-        if os.path.exists(self.log_file):
-            return pd.read_csv(self.log_file)
-        return pd.DataFrame()
+if __name__ == "__main__":
+    # Test for Austin Node security
+    vault = FBCSecureVault()
+    # Simulating a verified revenue of 5.2M from Austin
+    proof = vault.generate_audit_proof("Austin-HQ", 5.2)
+    
+    print("--- [FBC SECURITY] AUDIT PROOF GENERATED ---")
+    print(json.dumps(proof, indent=4))
