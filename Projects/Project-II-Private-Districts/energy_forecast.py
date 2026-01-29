@@ -1,35 +1,44 @@
 # ==========================================
 # PATH: /Projects/Project_II_Private_Districts/energy_forecast.py
-# DESCRIPTION: Energy Optimization Forecast Engine
-# VERSION: v2.0.0-ENERGY-MODEL
-# ROLE: Realistic AI-based Energy Savings Projection
+# DESCRIPTION: Energy Forecast Engine using Real Electricity Price Data
+# VERSION: v2.0.0-REAL-DATA
 # ==========================================
 
-import math
+from data_sources.energy_price_data import get_country_energy_price
+from data_sources.population_data import get_country_population
 
-def predict_energy_savings(base_monthly_bill: float, population: int = 1_000_000):
-    """
-    Predicts AI-optimized energy savings using scaling factors.
-    """
+class EnergyForecaster:
+    def __init__(self, country_code):
+        self.country_code = country_code.upper()
+        self.energy_price_data = get_country_energy_price(self.country_code)
+        self.population_data = get_country_population(self.country_code)
 
-    # Baseline annual energy cost
-    annual_energy_cost = base_monthly_bill * 12
+    def forecast(self):
+        """
+        Forecasts national-scale energy cost using:
+        - Real electricity price per kWh
+        - Real population data
+        """
 
-    # Population scaling impact
-    population_factor = math.log10(population)
+        if not self.energy_price_data or not self.population_data:
+            return {"error": "Real energy data unavailable"}
 
-    # AI efficiency curve (8% to 18% savings)
-    ai_efficiency_rate = min(0.08 + (population_factor * 0.02), 0.18)
+        price_per_kwh = self.energy_price_data["price_per_kwh"]
+        population = self.population_data["population"]
 
-    # AI predicted savings
-    ai_predicted_savings = annual_energy_cost * ai_efficiency_rate
+        # Assumption: average annual kWh consumption per capita
+        avg_kwh_per_capita = 1800  
 
-    # Optimized new annual cost
-    optimized_annual_cost = annual_energy_cost - ai_predicted_savings
+        total_kwh = population * avg_kwh_per_capita
+        total_energy_cost = total_kwh * price_per_kwh
 
-    return {
-        "Base_Annual_Cost": round(annual_energy_cost, 2),
-        "AI_Efficiency_Rate": round(ai_efficiency_rate, 3),
-        "ai_predicted_savings": round(ai_predicted_savings, 2),
-        "Optimized_Annual_Cost": round(optimized_annual_cost, 2)
-    }
+        # FBC optimization savings assumption 12%
+        fbc_savings = total_energy_cost * 0.12
+
+        return {
+            "country": self.country_code,
+            "price_per_kwh": price_per_kwh,
+            "population": population,
+            "total_energy_cost_usd": round(total_energy_cost, 2),
+            "fbc_projected_savings": round(fbc_savings, 2)
+        }
