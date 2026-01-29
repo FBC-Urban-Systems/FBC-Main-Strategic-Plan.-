@@ -1,0 +1,58 @@
+{
+  "manifest_version": "FINANCIAL_MODEL_V2",
+  "last_updated": "2026-01-29",
+  "financial_model_v2": {
+    "expansion_nodes": [
+      {
+        "city": "Austin",
+        "country": "USA",
+        "expected_revenue_m": 18.5,
+        "population_m": 1.2,
+        "traffic_index": 72,
+        "energy_market_size_m": 210,
+        "status": "PILOT_NODE_ACTIVE"
+      },
+      {
+        "city": "Dubai",
+        "country": "UAE",
+        "expected_revenue_m": 32.0,
+        "population_m": 3.6,
+        "traffic_index": 81,
+        "energy_market_size_m": 540,
+        "status": "EXPANSION_NODE_READY"
+      },
+      {
+        "city": "Riyadh",
+        "country": "Saudi Arabia",
+        "expected_revenue_m": 28.0,
+        "population_m": 7.2,
+        "traffic_index": 76,
+        "energy_market_size_m": 610,
+        "status": "EXPANSION_NODE_READY"
+      },
+      {
+        "city": "Singapore",
+        "country": "Singapore",
+        "expected_revenue_m": 26.5,
+        "population_m": 5.9,
+        "traffic_index": 85,
+        "energy_market_size_m": 480,
+        "status": "STRATEGIC_NODE_2030"
+      },
+      {
+        "city": "Toronto",
+        "country": "Canada",
+        "expected_revenue_m": 21.0,
+        "population_m": 6.3,
+        "traffic_index": 70,
+        "energy_market_size_m": 390,
+        "status": "STRATEGIC_NODE_2030"
+      }
+    ]
+  },
+  "integrity": {
+    "encryption_standard": "SHA-256",
+    "ledger_reference": "FBC-GLOBAL-LEDGER-001",
+    "confidence_level": 0.99
+  }
+}
