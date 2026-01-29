@@ -1,60 +1,95 @@
 # ==========================================
 # PATH: Projects/Project-VI-Global-Dominance/global_expansion_sim.py
-# DESCRIPTION: FBC Global Scaling & Valuation Engine
-# VERSION: v3.0-Billionaire-Target
+# DESCRIPTION: FBC Strategic Growth & Billion-Dollar Valuation Engine
+# VERSION: v5.0-Billionaire-Vision
 # ==========================================
 
-import time
 import pandas as pd
+import time
+import json
+from datetime import datetime
 
-class FBCGlobalSimulator:
+class FBCGrowthEngine:
     def __init__(self):
-        # Data based on Strategic Plan PDF (Page 1 & 5)
-        self.target_valuation = 35_000_000_000  # $35 Billion
-        self.target_cities = 80
-        self.avg_ltv_per_city = 42_500_000     # $42.5M as per Unit Economics
-        self.current_year = 2026 # Pre-launch year
-
-    def run_projection(self):
-        print(f"--- [FBC STRATEGIC SIMULATION] STARTING ---")
-        print(f"Target: {self.target_cities} Cities | Goal: ${self.target_valuation/1e9}B Valuation\n")
+        # Data points based on FBC Strategic Roadmap (2027-2037)
+        self.target_valuation_goal = 35000000000  # $35 Billion Target
+        self.annual_license_per_city = 12000000   # $12M ARR average per city node
+        self.valuation_multiple = 25              # Standard for high-growth Urban AI SaaS
+        self.current_year = 2026
         
-        cities = 0
-        data_log = []
-
+    def run_10_year_projection(self):
+        """
+        Simulates the growth from Phase I to Phase III (2027 - 2037).
+        Calculates ARR, City Nodes, and Total Corporate Valuation.
+        """
+        print("\n" + "="*50)
+        print("--- [FBC STRATEGIC EXPANSION SIMULATION] ---")
+        print(f"START DATE: {self.current_year} | TARGET: $35B VALUATION")
+        print("="*50 + "\n")
+        
+        projections = []
+        active_cities = 0
+        
+        # Iterating through the 10-year roadmap
         for year in range(2027, 2038):
-            # Scaling logic based on Phases
-            if year <= 2029: # Phase I: North America
-                cities += 5
-            elif year <= 2033: # Phase II: MENA & ASEAN
-                cities += 10
-            else: # Phase III: Global Scale
-                cities += 15
+            # Scaling Logic per Strategic Phase
+            if year <= 2029:  
+                # Phase I: Market Entry & Foundation (North America / Pilot Cities)
+                active_cities += 3 
+            elif year <= 2033: 
+                # Phase II: Rapid Global Scaling (MENA, Europe, Asia)
+                active_cities += 10
+            else:              
+                # Phase III: Planetary Infrastructure Dominance
+                active_cities += 15
             
-            cities = min(cities, self.target_cities)
+            # Ensure we don't exceed our 80-city roadmap cap for this version
+            active_cities = min(active_cities, 80)
+                
+            # Financial Mathematics
+            annual_recurring_revenue (ARR) = active_cities * self.annual_license_per_city
+            estimated_valuation = ARR * self.valuation_multiple
             
-            # Revenue calculation (ARR)
-            # Assuming $10M revenue share/license per city at scale
-            annual_revenue = cities * 10_000_000 
-            
-            # Valuation calculation (Using a 20x ARR multiple - typical for high-growth AI)
-            current_valuation = annual_revenue * 20 
-            
-            year_data = {
+            data_point = {
                 "Year": year,
-                "Active_Cities": cities,
-                "ARR_USD_M": f"${annual_revenue/1e6}M",
-                "Valuation_USD_B": f"${current_valuation/1e9:.2f}B"
+                "Active_Nodes": active_cities,
+                "Total_ARR_USD": f"${ARR/1e6:.1f}M",
+                "FBC_Valuation_USD": f"${estimated_valuation/1e9:.2f}B"
             }
-            data_log.append(year_data)
+            projections.append(data_point)
             
-            print(f"[YEAR {year}] Cities: {cities} | ARR: {year_data['ARR_USD_M']} | Valuation: {year_data['Valuation_USD_B']}")
-            time.sleep(0.3)
+            # Terminal Output with simulation delay for effect
+            print(f"[PROCESS] Year {year}: {active_cities:02} Cities Active | "
+                  f"ARR: {data_point['Total_ARR_USD']:>7} | "
+                  f"Valuation: {data_point['FBC_Valuation_USD']}")
+            
+            time.sleep(0.15) # Simulation processing time
+            
+        return projections
 
-        print(f"\n--- [PROJECTION COMPLETE] ---")
-        print(f"Target Valuation Reached: {'✅ YES' if current_valuation >= self.target_valuation else '⚠️ ADJUSTING MULTIPLES'}")
-        return data_log
+    def generate_final_report(self, results):
+        """
+        Summarizes the simulation outcome for executive review.
+        """
+        final_stat = results[-1]
+        print("\n" + "="*50)
+        print("--- [EXECUTIVE STRATEGIC SUMMARY] ---")
+        print(f"Final Year: {final_stat['Year']}")
+        print(f"Total Operational Nodes: {final_stat['Active_Nodes']}")
+        print(f"Final Projected Valuation: {final_stat['FBC_Valuation_USD']}")
+        
+        if float(final_stat['FBC_Valuation_USD'].replace('$', '').replace('B', '')) >= 35.0:
+            print("STATUS: GOAL REACHED ✅ | GLOBAL DOMINANCE ACHIEVED")
+        else:
+            print("STATUS: PHASE IV REQUIRED ⚠️")
+        print("="*50 + "\n")
 
 if __name__ == "__main__":
-    sim = FBCGlobalSimulator()
-    sim.run_projection()
+    # Initialize the Billion-Dollar Engine
+    simulator = FBCGrowthEngine()
+    
+    # Run the simulation
+    growth_results = simulator.run_10_year_projection()
+    
+    # Generate the Final Executive Report
+    simulator.generate_final_report(growth_results)
