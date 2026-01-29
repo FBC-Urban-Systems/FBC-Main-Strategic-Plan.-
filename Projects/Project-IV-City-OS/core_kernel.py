@@ -1,49 +1,44 @@
 # ==========================================
 # PATH: core_kernel.py
-# DESCRIPTION: The Central Brain of FBC OS
-# VERSION: v2.1-Gold-Standard
+# DESCRIPTION: FBC City-OS Core Kernel (Global Integration)
+# VERSION: v2.1-Gold
 # ==========================================
 
-import numpy as np
-from datetime import datetime
-from ai_engine_v2 import UrbanRevenueAI
-from accident_pred import predict_traffic_risk
+import sys
+import os
+
+# Adding sub-directories to system path for modular integration
+sys.path.append(os.path.abspath("Projects/Project-I-Urban-Revenue"))
+sys.path.append(os.path.abspath("Projects/Project-III-Traffic-Intelligence"))
+
+try:
+    from ai_engine_v2 import UrbanRevenueAI
+    from accident_pred import predict_traffic_risk
+    print("--- [KERNEL] All Modules Loaded Successfully ---")
+except ImportError as e:
+    print(f"--- [KERNEL] Critical Import Error: {e} ---")
+    sys.exit(1)
 
 class MasterCityKernel:
-    def __init__(self, city_name, maturity=0.8):
+    def __init__(self, city_name):
         self.city_name = city_name
-        self.maturity = maturity
-        self.start_time = datetime.now()
         print(f"--- [KERNEL] Initializing FBC OS for {city_name} ---")
 
-    def run_system_diagnostic(self, base_revenue_m):
+    def run_system_diagnostic(self, base_revenue):
         """
-        Runs a full diagnostic: Revenue Optimization + Traffic Risk.
-        This is the core logic that justifies the $35B valuation.
+        Executes a full system diagnostic combining Revenue AI and Traffic Risk modules.
         """
-        # 1. Initialize Engines
-        revenue_engine = UrbanRevenueAI(self.city_name, self.maturity)
+        # 1. Revenue AI Engine Check
+        engine = UrbanRevenueAI(self.city_name)
+        report = engine.analyze_yield(base_revenue)
         
-        # 2. Execute Revenue Analysis
-        rev_report = revenue_engine.analyze_yield(base_revenue_m)
+        # 2. Traffic Intelligence Risk Check
+        risk = predict_traffic_risk(75, "Clear")
         
-        # 3. Execute Safety Analysis (Simulating 70% density)
-        traffic_report = predict_traffic_risk(70, "clear")
-        
-        status_report = {
-            "city": self.city_name,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "revenue_optimization": rev_report['metrics']['ai_boost_percent'],
-            "traffic_safety_status": traffic_report['status'],
-            "system_integrity": "SECURED-SHA256"
-        }
-        
-        return status_report
+        print(f"--- [KERNEL] {self.city_name} Status: OPERATIONAL ---")
+        return report
 
 if __name__ == "__main__":
-    # Test Run for Austin HQ (The starting point of the plan)
-    kernel = MasterCityKernel("Austin-HQ")
-    report = kernel.run_system_diagnostic(100.0) # $100M base
-    print(f"--- [DIAGNOSTIC COMPLETE] ---")
-    print(f"Revenue Boost: {report['revenue_optimization']}")
-    print(f"Safety Status: {report['traffic_safety_status']}")
+    # Internal System Test
+    kernel = MasterCityKernel("Global-Sector-Alpha")
+    kernel.run_system_diagnostic(100.0)
