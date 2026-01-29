@@ -1,7 +1,7 @@
 # ==========================================
 # PATH: Projects/Project-I-Urban-Revenue/ai_engine_v2.py
 # DESCRIPTION: FBC AI Engine - Manifest-Driven Revenue Optimization
-# VERSION: v2.7-Stable (Production Ready)
+# VERSION: v2.7-Stable
 # ==========================================
 
 import json
@@ -12,18 +12,18 @@ from datetime import datetime
 class UrbanRevenueAI:
     def __init__(self, city_name):
         self.city_name = city_name
-        self.boost_factor = 0.25  # FBC Standard 25% Optimization Boost
-        self.manifest_data = self._load_city_data()
+        self.boost_factor = 0.25  # FBC Standard 25% Boost
+        self.manifest_data = self._load_manifest()
 
-    def _load_city_data(self):
+    def _load_manifest(self):
         """
-        Dynamically pulls city financial data from the global manifest.
+        Locates and loads the Global Cities Manifest to get real economic data.
         """
-        # Try to find the manifest in the root directory
-        manifest_path = os.path.join(os.getcwd(), 'global_cities_manifest.json')
+        # Look for the manifest in the root directory relative to this project
+        path = os.path.join(os.getcwd(), 'global_cities_manifest.json')
         
         try:
-            with open(manifest_path, 'r') as f:
+            with open(path, 'r') as f:
                 data = json.load(f)
                 nodes = data.get('financial_model_v2', {}).get('expansion_nodes', [])
                 for node in nodes:
@@ -31,48 +31,42 @@ class UrbanRevenueAI:
                         return node
             return None
         except Exception as e:
-            print(f"--- [ERROR] Manifest Load Failure: {e} ---")
+            print(f"--- [SYSTEM ERROR] Manifest unreachable: {e} ---")
             return None
 
     def analyze_yield(self):
         """
-        Calculates optimized revenue based on real manifest values.
+        Calculates optimized revenue using data from the manifest.
         """
         if not self.manifest_data:
-            return {"error": f"City '{self.city_name}' data not found in Manifest."}
+            return {"error": f"City '{self.city_name}' not found in global manifest."}
 
-        # Real value from your JSON file
-        base_revenue = self.manifest_data['expected_revenue_m']
+        # Pulling the base revenue directly from your JSON file
+        base_val = self.manifest_data['expected_revenue_m']
         
-        # Adding a bit of AI 'Smart' variance (simulating market conditions)
-        market_variance = np.random.uniform(-0.02, 0.05)
-        total_boost = self.boost_factor + market_variance
+        # Simulating AI Intelligence: adding market volatility (-2% to +5%)
+        volatility = np.random.uniform(-0.02, 0.05)
+        final_gain_percent = self.boost_factor + volatility
         
-        optimized_total = base_revenue * (1 + total_boost)
-        net_profit_gain = optimized_total - base_revenue
-
+        optimized_total = base_val * (1 + final_gain_percent)
+        net_profit = optimized_total - base_val
+        
         return {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "city": self.city_name,
-            "status": self.manifest_data['status'],
-            "analysis": {
-                "original_revenue_m": f"${base_revenue}M",
-                "ai_boost_applied": f"{total_boost*100:.2f}%",
-                "fbc_target_revenue_m": f"${optimized_total:.2f}M",
-                "net_value_created_m": f"${net_profit_gain:.2f}M"
+            "region": self.manifest_data['region'],
+            "metrics": {
+                "base_revenue_m": f"${base_val}M",
+                "ai_boost_percent": f"{final_gain_percent*100:.2f}%",
+                "fbc_optimized_total_m": f"${optimized_total:.2f}M",
+                "net_value_created_m": f"${net_profit:.2f}M"
             }
         }
 
 if __name__ == "__main__":
-    # Test Run using 'Dubai' from your manifest
-    engine = UrbanRevenueAI("Dubai")
+    # Test Run: Analyze Austin based on the real JSON data
+    engine = UrbanRevenueAI("Austin")
     report = engine.analyze_yield()
     
-    print("--- [FBC AI REVENUE ENGINE REPORT] ---")
-    if "error" in report:
-        print(report["error"])
-    else:
-        print(f"Targeting City: {report['city']}")
-        print(f"Base Revenue: {report['analysis']['original_revenue_m']}")
-        print(f"AI Optimized: {report['analysis']['fbc_target_revenue_m']}")
-        print(f"Net Gain: {report['analysis']['net_value_created_m']}")
+    print("--- [FBC REVENUE ENGINE REPORT] ---")
+    print(json.dumps(report, indent=4))
