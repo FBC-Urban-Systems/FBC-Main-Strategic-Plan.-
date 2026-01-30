@@ -1,7 +1,7 @@
 # ==========================================
 # PATH: /data_sources/gdp_data.py
 # DESCRIPTION: Real GDP Data Connector
-# VERSION: v2.0.0-SUPREME-STABLE
+# VERSION: v2.2.0-SUPREME-COMPAT
 # ==========================================
 
 import requests
@@ -11,7 +11,7 @@ BASE_URL = "https://api.worldbank.org/v2/country/{}/indicator/NY.GDP.MKTP.CD?for
 def fetch_gdp(country_code: str) -> float:
     """
     Fetch latest GDP value for given country code from World Bank API.
-    Supreme-grade safe network handling.
+    Production-grade safe network handling.
     """
 
     url = BASE_URL.format(country_code.upper())
@@ -38,3 +38,13 @@ def fetch_gdp(country_code: str) -> float:
     except Exception as e:
         print(f"[GDP DATA ERROR] {e}")
         return 0.0
+
+
+# ======================================================
+# BACKWARD COMPATIBILITY ALIAS (DO NOT REMOVE)
+# ======================================================
+def get_country_gdp(country_code: str) -> float:
+    """
+    Legacy alias for older engines.
+    """
+    return fetch_gdp(country_code)
