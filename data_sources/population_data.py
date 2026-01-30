@@ -1,7 +1,7 @@
 # ==========================================
 # PATH: /data_sources/population_data.py
 # DESCRIPTION: Real Population Data Connector
-# VERSION: v2.1.0-SUPREME-FINAL
+# VERSION: v2.2.0-SUPREME-COMPAT
 # ==========================================
 
 import requests
@@ -38,3 +38,13 @@ def fetch_population(country_code: str) -> int:
     except Exception as e:
         print(f"[POPULATION DATA ERROR] {e}")
         return 0
+
+
+# ======================================================
+# BACKWARD COMPATIBILITY ALIAS (DO NOT REMOVE)
+# ======================================================
+def get_country_population(country_code: str) -> int:
+    """
+    Legacy alias for older engines.
+    """
+    return fetch_population(country_code)
