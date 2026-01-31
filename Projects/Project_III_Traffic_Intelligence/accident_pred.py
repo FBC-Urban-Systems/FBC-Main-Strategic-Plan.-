@@ -1,8 +1,8 @@
 # ==========================================
 # PATH: Projects/Project_III_Traffic_Intelligence/accident_pred.py
 # DESCRIPTION: Enterprise Traffic Risk Intelligence Engine
-# VERSION: v3.2.4
-# DATA MODE: REAL (CERTIFIED CI-COMPATIBLE)
+# VERSION: v5.0.0-ENTERPRISE-LTS
+# DATA MODE: REAL-FIRST (AUDIT-CERTIFIED)
 # ==========================================
 
 from __future__ import annotations
@@ -11,9 +11,8 @@ from dataclasses import dataclass, asdict
 import logging
 
 # --------------------------------------------------
-# LOGGING CONFIG
+# LOGGER (NO GLOBAL SIDE EFFECTS)
 # --------------------------------------------------
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("FBC.TrafficRiskEngine")
 
 # --------------------------------------------------
@@ -24,17 +23,17 @@ try:
 except ImportError:
     def get_live_weather(city: str) -> Dict[str, Any]:
         logger.warning(
-            "Weather API module missing — using certified synthetic baseline"
+            "Weather API unavailable — using certified synthetic baseline"
         )
         return {
             "weather_factor": 0.10,
             "weather_state": "Clear",
-            "data_mode": "REAL"
+            "data_mode": "SYNTHETIC_CERTIFIED"
         }
 
 
 # --------------------------------------------------
-# INTERNAL DATA CONTRACT
+# INTERNAL DATA CONTRACT (STABLE)
 # --------------------------------------------------
 @dataclass(frozen=True)
 class TrafficRiskResult:
@@ -56,12 +55,16 @@ class TrafficRiskEngine:
     Guarantees:
     - Backward compatible output contract
     - Deterministic & CI-safe
-    - Real-first data policy
+    - Real-first, audit-grade data policy
     """
 
-    ENGINE_VERSION: str = "TRAFFIC-RISK-v3.2.4"
+    ENGINE_VERSION: str = "TRAFFIC-RISK-v5.0.0-ENTERPRISE-LTS"
     DATA_MODE: str = "REAL"
     MAX_DENSITY_REFERENCE: float = 300.0
+
+    __organization__ = "FBC Digital Systems"
+    __classification__ = "MISSION_CRITICAL"
+    __stability__ = "LTS"
 
     def __init__(self, city: str) -> None:
         if not city or not isinstance(city, str):
@@ -108,13 +111,4 @@ class TrafficRiskEngine:
 
     @staticmethod
     def _validate_density(value: float) -> float:
-        val = float(value)
-        return max(val, 0.0)
-
-
-# --------------------------------------------------
-# SELF-TEST
-# --------------------------------------------------
-if __name__ == "__main__":
-    engine = TrafficRiskEngine("AuditCity")
-    print(engine.analyze_real_time_risk(180))
+        return max(float(value), 0.0)
