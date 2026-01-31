@@ -1,7 +1,7 @@
 # ==========================================
 # PATH: Projects/Project_III_Security_Ledger/secure_vault.py
 # DESCRIPTION: Enterprise-Grade Immutable Security Ledger
-# VERSION: v4.0.0-ENTERPRISE-IMMUTABLE-LEDGER
+# VERSION: v4.0.1-ENTERPRISE-IMMUTABLE-LEDGER
 # DATA MODE: REAL (CI-SAFE / PROD-READY)
 # ==========================================
 
@@ -18,16 +18,15 @@ class FBCSecureVault:
     """
     Enterprise-Grade Immutable Security Ledger (Sector Level)
 
-    Capabilities:
-    - Deterministic SHA-256 hashing
-    - Chain-linked immutable records
-    - Atomic writes (corruption-safe)
-    - Schema-versioned ledger blocks
-    - CI-safe + Production-ready
-    - Forward-compatible with City OS & Digital Earth
+    Guarantees:
+    - Backward-compatible public contracts
+    - Deterministic immutable hashing
+    - Atomic disk writes
+    - Schema versioning
+    - CI-safe & production-ready
     """
 
-    VAULT_VERSION = "SECURE-VAULT-v4.0.0"
+    VAULT_VERSION = "SECURE-VAULT-v4.0.1"
     LEDGER_SCHEMA_VERSION = "LEDGER-SCHEMA-v1"
     PROTOCOL = "FBC-SHA256-IMMUTABLE"
 
@@ -48,10 +47,10 @@ class FBCSecureVault:
             self._initialize_genesis()
 
     # --------------------------------------------------
-    # GENESIS
+    # GENESIS BLOCK
     # --------------------------------------------------
     def _initialize_genesis(self) -> None:
-        genesis_block = {
+        genesis = {
             "index": 0,
             "timestamp": self._now(),
             "schema": self.LEDGER_SCHEMA_VERSION,
@@ -64,7 +63,7 @@ class FBCSecureVault:
             "status": "GENESIS",
             "vault_version": self.VAULT_VERSION
         }
-        self._atomic_save([genesis_block])
+        self._atomic_save([genesis])
 
     # --------------------------------------------------
     # CORE UTILITIES
@@ -81,7 +80,7 @@ class FBCSecureVault:
         return self._hash(canonical + self._salt)
 
     # --------------------------------------------------
-    # IO (ATOMIC)
+    # LEDGER IO (ATOMIC)
     # --------------------------------------------------
     def _load_ledger(self) -> List[Dict[str, Any]]:
         with open(self.ledger_file, "r", encoding="utf-8") as f:
@@ -99,8 +98,20 @@ class FBCSecureVault:
         os.replace(temp_name, self.ledger_file)
 
     # --------------------------------------------------
-    # PUBLIC API
+    # PUBLIC CONTRACT (STABLE)
     # --------------------------------------------------
+    def generate_proof(
+        self,
+        project_id: str,
+        node_id: str,
+        amount: float
+    ) -> Dict[str, Any]:
+        """
+        Stable public API.
+        Required by engine contracts & CI tests.
+        """
+        return self.generate_audit_proof(project_id, node_id, amount)
+
     def generate_audit_proof(
         self,
         project_id: str,
@@ -109,12 +120,12 @@ class FBCSecureVault:
     ) -> Dict[str, Any]:
 
         if amount < 0:
-            raise ValueError("Negative values are not permitted in immutable ledger")
+            raise ValueError("Negative values are not permitted")
 
         ledger = self._load_ledger()
         last = ledger[-1]
 
-        block_core = {
+        block = {
             "index": last["index"] + 1,
             "timestamp": self._now(),
             "schema": self.LEDGER_SCHEMA_VERSION,
@@ -126,14 +137,14 @@ class FBCSecureVault:
             "vault_version": self.VAULT_VERSION
         }
 
-        block_core["audit_hash"] = self._canonical_hash(block_core)
-        block_core["status"] = "IMMUTABLE_RECORD"
+        block["audit_hash"] = self._canonical_hash(block)
+        block["status"] = "IMMUTABLE_RECORD"
 
-        ledger.append(block_core)
+        ledger.append(block)
         self._atomic_save(ledger)
 
-        self._mirror_global_safe(block_core)
-        return block_core
+        self._mirror_global_safe(block)
+        return block
 
     # --------------------------------------------------
     # OPTIONAL GLOBAL MIRROR
@@ -202,6 +213,5 @@ class FBCSecureVault:
 # --------------------------------------------------
 if __name__ == "__main__":
     vault = FBCSecureVault()
-    vault.generate_audit_proof("PROJECT_III", "AuditNode-01", 100.5)
-    result = vault.verify_sector_ledger()
-    print(result)
+    vault.generate_proof("PROJECT_III", "AuditNode-01", 100.5)
+    print(vault.verify_sector_ledger())
