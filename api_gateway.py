@@ -19,7 +19,7 @@ from Projects.Project_III_Security_Ledger.secure_vault import FBCSecureVault
 class FBC_APIGateway:
     """
     Unified internal gateway that orchestrates all FBC AI engines.
-    
+
     This class is NOT an HTTP layer.
     It is designed for:
     - Simulations
@@ -59,7 +59,9 @@ class FBC_APIGateway:
     # =================================================
     # ENERGY INTELLIGENCE
     # =================================================
-    def forecast_energy_savings(self, city: str, annual_energy_bill: float) -> Dict[str, Any]:
+    def forecast_energy_savings(
+        self, city: str, annual_energy_bill: float
+    ) -> Dict[str, Any]:
         if annual_energy_bill <= 0:
             raise ValueError("Energy bill must be positive")
 
@@ -82,7 +84,9 @@ class FBC_APIGateway:
     # =================================================
     # TRAFFIC INTELLIGENCE
     # =================================================
-    def analyze_traffic_risk(self, city: str, traffic_density: int) -> Dict[str, Any]:
+    def analyze_traffic_risk(
+        self, city: str, traffic_density: int
+    ) -> Dict[str, Any]:
         if traffic_density < 0:
             raise ValueError("Traffic density must be non-negative")
 
