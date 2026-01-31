@@ -1,9 +1,12 @@
 {
   "schema_metadata": {
     "schema_name": "FBC_Private_District_Energy_Contract",
-    "version": "4.0.0",
+    "version": "5.0.0",
+    "schema_status": "ENTERPRISE_STABLE",
+    "backward_compatible_with": ["4.x"],
     "last_updated": "2026-01-29",
-    "author": "FBC Digital Systems"
+    "author": "FBC Digital Systems",
+    "governance_level": "SUPREME"
   },
 
   "unit_type": "Private_Smart_District",
@@ -13,28 +16,34 @@
       "status": "active",
       "forecasting_enabled": true,
       "optimization_target_percent": 15,
-      "ai_engine_version": "ENERGY-AI-v4.0",
-      "data_refresh_interval_minutes": 15
+      "ai_engine_version": "ENERGY-AI-v7.0",
+      "data_refresh_interval_minutes": 15,
+      "data_mode": "REAL",
+      "fail_safe_policy": "CONSERVATIVE"
     },
     "security_systems": {
       "access_control": "ai_integrated",
       "monitoring_level": "high",
-      "ledger_logging": true
+      "ledger_logging": true,
+      "tamper_detection": true
     }
   },
 
   "district_profiles": {
     "INDUSTRIAL": {
       "default_efficiency_target_percent": 15,
-      "max_units_supported": 10000
+      "max_units_supported": 10000,
+      "priority_level": "HIGH"
     },
     "COMMERCIAL": {
       "default_efficiency_target_percent": 12,
-      "max_units_supported": 15000
+      "max_units_supported": 15000,
+      "priority_level": "MEDIUM"
     },
     "RESIDENTIAL": {
       "default_efficiency_target_percent": 10,
-      "max_units_supported": 50000
+      "max_units_supported": 50000,
+      "priority_level": "STANDARD"
     }
   },
 
@@ -43,18 +52,29 @@
     "setup_fee_max": 3000000,
     "annual_saas_min": 500000,
     "annual_saas_max": 1000000,
-    "currency": "USD"
+    "currency": "USD",
+    "pricing_model": "ENTERPRISE_SAAS"
   },
 
   "compliance": {
     "data_privacy": "GDPR/SDEP_COMPLIANT",
     "security_protocol": "SHA-256-FBC-GOLD",
-    "audit_required": true
+    "audit_required": true,
+    "audit_frequency": "ANNUAL",
+    "regulatory_ready": true
   },
 
   "integration_hooks": {
     "energy_ai_function": "predict_energy_savings",
     "ledger_function": "generate_proof",
-    "dashboard_module": "fbc_live_dashboard"
+    "dashboard_module": "fbc_live_dashboard",
+    "future_event_bus": "FBC_EVENT_STREAM"
+  },
+
+  "future_extensions": {
+    "real_time_grid_sync": true,
+    "carbon_credit_tracking": "PLANNED",
+    "federal_energy_api": "READY",
+    "self_learning_forecast": "ENABLED"
   }
 }
