@@ -1,12 +1,25 @@
 # ==========================================
 # PATH: data_sources/energy_price_data.py
-# DESCRIPTION: Enterprise-Grade Energy Price Data Connector
-# SOURCE: Global Electricity Prices (Public Dataset)
-# VERSION: v3.0.0-SUPREME
+# DESCRIPTION: Enterprise-Grade Energy Price Intelligence Connector
+# PRIMARY SOURCE: Global Electricity Prices (Public Dataset)
+# FALLBACK MODE: Deterministic / CI-Safe
+#
+# VERSION: v4.0.0-LTS
+# CLASSIFICATION: ENTERPRISE_CRITICAL
+# CONTRACT: ENERGY_PRICE_DATA_PROVIDER_CORE
 # ==========================================
+
+from __future__ import annotations
 
 from typing import Dict
 import requests
+
+# --------------------------------------------------
+# MODULE METADATA
+# --------------------------------------------------
+__version__ = "4.0.0-LTS"
+__classification__ = "ENTERPRISE_CRITICAL"
+__contract_role__ = "ENERGY_PRICE_DATA_PROVIDER_CORE"
 
 # --------------------------------------------------
 # CONFIGURATION
@@ -17,36 +30,47 @@ DATASET_URL = (
 
 DEFAULT_TIMEOUT_SECONDS = 6
 
+REALTIME_MODE = "REAL"
+FALLBACK_MODE = "DETERMINISTIC_FALLBACK"
+
+# --------------------------------------------------
+# DETERMINISTIC FALLBACK RESPONSE
+# --------------------------------------------------
 DEFAULT_ENERGY_PRICE_RESPONSE = {
     "country": "UNKNOWN",
     "price_per_kwh": 0.0,
     "provider": "FALLBACK",
-    "confidence": "LOW"
+    "confidence": "LOW",
+    "data_mode": FALLBACK_MODE
 }
-
 
 # --------------------------------------------------
 # PUBLIC CONTRACT
 # --------------------------------------------------
 def get_country_energy_price(country_code: str) -> Dict[str, float]:
     """
-    Fetches average electricity price (USD per kWh) for a country.
+    Enterprise-grade energy price intelligence provider.
 
-    Guarantees:
+    Contract Guarantees:
     - Never raises exceptions
-    - Always returns deterministic structure
-    - Uses real public dataset when available
-    - CI-safe fallback on failure
+    - Always returns validated structure
+    - Uses real public data when available
+    - Deterministic CI-safe fallback
+    - Audit-ready output
 
     Returns:
     {
         country: str,
         price_per_kwh: float,
         provider: str,
-        confidence: str
+        confidence: str,
+        data_mode: str
     }
     """
 
+    # -------------------------------
+    # INPUT VALIDATION
+    # -------------------------------
     if not country_code or not isinstance(country_code, str):
         return _fallback_energy_price("INVALID_COUNTRY_CODE")
 
@@ -67,14 +91,15 @@ def get_country_energy_price(country_code: str) -> Dict[str, float]:
                     "country": country_code.upper(),
                     "price_per_kwh": float(price),
                     "provider": "GLOBAL_ELECTRICITY_DATASET",
-                    "confidence": "MEDIUM"
+                    "confidence": "MEDIUM",
+                    "data_mode": REALTIME_MODE
                 }
 
         return _fallback_energy_price("COUNTRY_NOT_FOUND")
 
     except Exception:
+        # Hard deterministic fallback
         return _fallback_energy_price("NETWORK_OR_DATASET_FAILURE")
-
 
 # --------------------------------------------------
 # INTERNAL HELPERS
