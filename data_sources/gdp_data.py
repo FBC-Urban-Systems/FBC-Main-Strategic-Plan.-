@@ -1,50 +1,96 @@
 # ==========================================
-# PATH: /data_sources/gdp_data.py
-# DESCRIPTION: Real GDP Data Connector
-# VERSION: v2.2.0-SUPREME-COMPAT
+# PATH: data_sources/gdp_data.py
+# DESCRIPTION: Enterprise-Grade GDP Data Connector
+# SOURCE: World Bank Open API
+# VERSION: v3.0.0-SUPREME
 # ==========================================
 
+from typing import Dict
 import requests
 
-BASE_URL = "https://api.worldbank.org/v2/country/{}/indicator/NY.GDP.MKTP.CD?format=json"
+# --------------------------------------------------
+# CONFIGURATION
+# --------------------------------------------------
+WORLD_BANK_BASE_URL = (
+    "https://api.worldbank.org/v2/country/{}/indicator/NY.GDP.MKTP.CD?format=json"
+)
+DEFAULT_TIMEOUT_SECONDS = 6
 
-def fetch_gdp(country_code: str) -> float:
+# Deterministic fallback (CI-safe)
+DEFAULT_GDP_RESPONSE = {
+    "gdp": 0.0,
+    "provider": "FALLBACK",
+    "confidence": "LOW"
+}
+
+
+# --------------------------------------------------
+# PUBLIC CONTRACT
+# --------------------------------------------------
+def fetch_gdp(country_code: str) -> Dict[str, float]:
     """
-    Fetch latest GDP value for given country code from World Bank API.
-    Production-grade safe network handling.
+    Fetches latest GDP value using World Bank API.
+
+    Guarantees:
+    - Never raises exceptions
+    - Always returns deterministic structure
+    - Uses real data when available
+    - CI-safe fallback otherwise
+
+    Returns:
+    {
+        gdp: float,
+        provider: str,
+        confidence: str
+    }
     """
 
-    url = BASE_URL.format(country_code.upper())
+    if not country_code or not isinstance(country_code, str):
+        return _fallback_gdp("INVALID_COUNTRY_CODE")
+
+    url = WORLD_BANK_BASE_URL.format(country_code.upper())
 
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=DEFAULT_TIMEOUT_SECONDS)
         response.raise_for_status()
-        data = response.json()
 
-        if not data or len(data) < 2 or not data[1]:
-            raise ValueError("No GDP data returned")
+        payload = response.json()
 
-        latest_entry = data[1][0]
-        gdp_value = latest_entry.get("value")
+        if not payload or len(payload) < 2 or not payload[1]:
+            return _fallback_gdp("EMPTY_PAYLOAD")
 
-        if gdp_value is None:
-            raise ValueError("GDP value missing")
+        latest_entry = payload[1][0]
+        value = latest_entry.get("value")
 
-        return float(gdp_value)
+        if value is None:
+            return _fallback_gdp("MISSING_VALUE")
 
-    except requests.exceptions.RequestException as e:
-        print(f"[GDP CONNECTOR ERROR] {e}")
-        return 0.0
-    except Exception as e:
-        print(f"[GDP DATA ERROR] {e}")
-        return 0.0
+        return {
+            "gdp": float(value),
+            "provider": "WORLD_BANK",
+            "confidence": "HIGH"
+        }
+
+    except Exception:
+        return _fallback_gdp("NETWORK_OR_API_FAILURE")
 
 
-# ======================================================
-# BACKWARD COMPATIBILITY ALIAS (DO NOT REMOVE)
-# ======================================================
+# --------------------------------------------------
+# BACKWARD-COMPATIBILITY LAYER
+# --------------------------------------------------
 def get_country_gdp(country_code: str) -> float:
     """
-    Legacy alias for older engines.
+    Legacy alias (returns numeric GDP only).
+    Guaranteed to never raise.
     """
-    return fetch_gdp(country_code)
+    result = fetch_gdp(country_code)
+    return float(result.get("gdp", 0.0))
+
+
+# --------------------------------------------------
+# INTERNAL HELPERS
+# --------------------------------------------------
+def _fallback_gdp(reason: str) -> Dict[str, float]:
+    fallback = DEFAULT_GDP_RESPONSE.copy()
+    fallback["fallback_reason"] = reason
+    return fallback
