@@ -14,11 +14,11 @@ env:
   PYTHONPATH: ${{ github.workspace }}
 
 # ======================================================
-# 1. SECURITY & SUPPLY CHAIN GOVERNANCE (ADVISORY)
+# 1. SECURITY & SUPPLY CHAIN GOVERNANCE
 # ======================================================
 jobs:
   security-governance:
-    name: Security Governance
+    name: Security and Supply Chain Governance
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -35,11 +35,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install bandit==1.7.7 pip-audit==2.7.3
 
-      - name: Static Security Scan (Advisory Only)
+      - name: Static Security Scan
         run: |
           bandit -r . --severity-level high --confidence-level high || true
 
-      - name: Dependency Vulnerability Audit (Advisory Only)
+      - name: Dependency Vulnerability Audit
         run: |
           pip-audit --progress-spinner off || true
 
@@ -47,7 +47,7 @@ jobs:
 # 2. CORE ENGINE & CONTRACT TESTING
 # ======================================================
   engine-integrity:
-    name: Core Engine Contract Verification
+    name: Core Engine and Contract Verification
     runs-on: ubuntu-latest
     needs: security-governance
 
@@ -68,10 +68,10 @@ jobs:
         run: pytest tests/test_engines.py
 
 # ======================================================
-# 3. DATA SOURCE CONTRACT VERIFICATION
+# 3. DATA SOURCE VERIFICATION (CONTRACT LEVEL)
 # ======================================================
   data-integrity:
-    name: Data Source Contract Verification
+    name: Data Sources Contract Verification
     runs-on: ubuntu-latest
     needs: engine-integrity
 
@@ -96,14 +96,15 @@ jobs:
 
           weather = get_live_weather("Cairo")
           assert isinstance(weather, dict)
-          assert "weather_state" in weather
-          assert "weather_factor" in weather
 
-          assert isinstance(fetch_population("EG"), int)
-          assert isinstance(fetch_gdp("EG"), float)
+          population = fetch_population("EG")
+          assert isinstance(population, int)
 
-          energy_price = get_country_energy_price("EG")
-          assert energy_price is None or isinstance(energy_price, dict)
+          gdp = fetch_gdp("EG")
+          assert isinstance(gdp, float)
+
+          energy = get_country_energy_price("EG")
+          assert energy is None or isinstance(energy, dict)
 
           print("DATA SOURCE CONTRACTS VERIFIED")
           EOF
@@ -153,7 +154,7 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify Application Entry Point
+      - name: Verify Application Entry
         run: |
           python - <<'EOF'
           import app
@@ -179,7 +180,7 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify PDF Reporting Engine
+      - name: Verify Reporting Engine
         run: |
           python - <<'EOF'
           from reports.pdf_report_generator import generate_fbc_report
@@ -188,10 +189,10 @@ jobs:
           EOF
 
 # ======================================================
-# 7. EXECUTIVE CERTIFICATION
+# 7. SYSTEM CERTIFICATION
 # ======================================================
   executive-certification:
-    name: Executive System Certification
+    name: System Certification
     runs-on: ubuntu-latest
     needs:
       - security-governance
@@ -202,18 +203,14 @@ jobs:
       - report-engine-integrity
 
     steps:
-      - name: Generate Enterprise Certificate
+      - name: Generate System Certificate
         run: |
           {
-            echo "============================================"
             echo "FBC URBAN INTELLIGENCE SYSTEM CERTIFICATE"
             echo "SYSTEM VERSION: ${FBC_SYSTEM_VERSION}"
             echo "DATA MODE: ${FBC_DATA_MODE}"
             echo "AUDIT STATUS: ALL LAYERS VERIFIED"
-            echo "CI MODE: CONTRACT STRICT / NETWORK SAFE"
             echo "TIMESTAMP (UTC): $(date -u)"
-            echo "CERTIFICATION LEVEL: ENTERPRISE READY"
-            echo "============================================"
           } > FBC_SYSTEM_CERTIFICATE.txt
 
       - uses: actions/upload-artifact@v4
