@@ -109,12 +109,8 @@ class RevenueOptimizer:
 # ENTERPRISE SELF-TEST (CI SAFE)
 # --------------------------------------------------
 if __name__ == "__main__":
-    print("\n--- FBC REVENUE OPTIMIZER ENTERPRISE MAX TEST ---")
-
     optimizer = RevenueOptimizer("CI-Test-City")
     report = optimizer.project_incremental_gain(1_000_000, 0.20)
 
     for k, v in report.items():
         print(f"{k}: {v}")
-
-    print("--- REVENUE OPTIMIZER ENTERPRISE MAX OPERATIONAL ---\n")
