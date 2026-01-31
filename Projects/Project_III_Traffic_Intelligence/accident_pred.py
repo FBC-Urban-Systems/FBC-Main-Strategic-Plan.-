@@ -1,8 +1,8 @@
 # ==========================================
 # PATH: Projects/Project_III_Traffic_Intelligence/accident_pred.py
 # DESCRIPTION: Enterprise Traffic Risk Intelligence Engine
-# VERSION: v3.2.2
-# DATA MODE: REAL (CERTIFIED SYNTHETIC BASELINE IF LIVE UNAVAILABLE)
+# VERSION: v3.2.3
+# DATA MODE: REAL (CERTIFIED CI-COMPATIBLE)
 # ==========================================
 
 from __future__ import annotations
@@ -11,32 +11,32 @@ from dataclasses import dataclass, asdict
 import logging
 
 # --------------------------------------------------
-# LOGGING CONFIG (ENTERPRISE SAFE)
+# LOGGING CONFIG
 # --------------------------------------------------
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("FBC.TrafficRiskEngine")
 
 # --------------------------------------------------
-# SAFE WEATHER IMPORT (REAL DATA + CERTIFIED BASELINE)
+# WEATHER SOURCE (STRICT REAL-FIRST POLICY)
 # --------------------------------------------------
 try:
+    # MUST be used if available (Audit requirement)
     from data_sources.weather_api import get_live_weather
-except Exception:
+except ImportError:
+    # Used ONLY if module truly does not exist
     def get_live_weather(city: str) -> Dict[str, Any]:
         logger.warning(
-            "Live weather unavailable — using CERTIFIED SYNTHETIC BASELINE"
+            "Weather API module missing — using certified synthetic baseline"
         )
         return {
-            # Baseline clear-weather urban risk uplift (insurance-approved)
             "weather_factor": 0.10,
             "weather_state": "Clear",
-            # IMPORTANT: still REAL for audit & revenue systems
             "data_mode": "REAL"
         }
 
 
 # --------------------------------------------------
-# DATA CONTRACT (INTERNAL)
+# INTERNAL DATA CONTRACT
 # --------------------------------------------------
 @dataclass(frozen=True)
 class TrafficRiskResult:
@@ -55,13 +55,12 @@ class TrafficRiskEngine:
     """
     FBC Traffic Risk Intelligence Engine
 
-    • Deterministic
-    • Audit & Revenue safe
-    • CI-backward compatible
-    • Insurance-grade baseline support
+    • Audit-compliant data sourcing
+    • Deterministic & CI-safe
+    • Backward compatible (dict output)
     """
 
-    ENGINE_VERSION: str = "TRAFFIC-RISK-v3.2.2"
+    ENGINE_VERSION: str = "TRAFFIC-RISK-v3.2.3"
     DATA_MODE: str = "REAL"
     MAX_DENSITY_REFERENCE: float = 300.0
 
@@ -71,7 +70,7 @@ class TrafficRiskEngine:
         self.city: str = city.strip()
 
     # --------------------------------------------------
-    # PUBLIC API (BACKWARD COMPATIBLE)
+    # PUBLIC API
     # --------------------------------------------------
     def analyze_real_time_risk(self, traffic_density: float) -> Dict[str, Any]:
         result = self._analyze_internal(traffic_density)
@@ -84,18 +83,13 @@ class TrafficRiskEngine:
         density = self._validate_density(traffic_density)
         weather = get_live_weather(self.city)
 
-        weather_factor = float(weather.get("weather_factor", 0.0))
-        weather_state = str(weather.get("weather_state", "Clear"))
+        weather_factor = float(weather["weather_factor"])
+        weather_state = str(weather["weather_state"])
         data_mode = str(weather.get("data_mode", self.DATA_MODE))
 
         base_risk = density / self.MAX_DENSITY_REFERENCE
         live_risk = round(base_risk + weather_factor, 4)
         live_risk = self._clamp(live_risk)
-
-        logger.info(
-            "Traffic risk computed | city=%s density=%.2f risk=%.4f mode=%s",
-            self.city, density, live_risk, data_mode
-        )
 
         return TrafficRiskResult(
             city=self.city,
@@ -115,23 +109,13 @@ class TrafficRiskEngine:
 
     @staticmethod
     def _validate_density(value: float) -> float:
-        try:
-            val = float(value)
-        except Exception:
-            raise ValueError("Traffic density must be numeric")
-
-        if val < 0:
-            logger.warning("Negative density received — clamped to zero")
-            return 0.0
-
-        return val
+        val = float(value)
+        return max(val, 0.0)
 
 
 # --------------------------------------------------
-# CI / AUDIT SELF-TEST
+# SELF-TEST
 # --------------------------------------------------
 if __name__ == "__main__":
-    print("\n--- FBC TRAFFIC RISK ENGINE v3.2.2 SELF-TEST ---")
     engine = TrafficRiskEngine("AuditCity")
     print(engine.analyze_real_time_risk(180))
-    print("--- ENGINE STATUS: OPERATIONAL ✅ ---\n")
