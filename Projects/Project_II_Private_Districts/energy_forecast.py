@@ -2,6 +2,19 @@
 # ENERGY FORECAST ENGINE — ENTERPRISE SAFE
 # ==========================================
 
+class EnergyForecaster:
+    """
+    Backward-compatible enterprise wrapper.
+    Preserves legacy imports while delegating to modern logic.
+    """
+
+    def __init__(self, district_data):
+        self.district_data = district_data
+
+    def forecast(self) -> dict:
+        return predict_energy_savings(self.district_data)
+
+
 def forecast_energy_savings(district_data: dict) -> dict:
     """
     Core energy savings forecast logic.
