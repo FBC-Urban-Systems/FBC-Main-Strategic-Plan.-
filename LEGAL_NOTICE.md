@@ -1,97 +1,89 @@
-# ⚖️ Legal Notice & Intellectual Property Protection  
-## FBC Digital Systems — Global Technology IP Framework
+# ⚖️ Legal Notice & Intellectual Property
+
+## FBC Digital Systems — Intellectual Property Framework
 
 ---
 
 ## 🔒 Intellectual Property Ownership
 
-All software code, system architectures, AI models, simulation engines, data schemas, financial logic, strategic documentation, and operational methodologies contained in this repository are the exclusive intellectual property of **FBC Digital Systems**.
+All original source code, system designs, software architectures,
+algorithms, simulation models, documentation, and technical materials
+contained in this repository are the intellectual property of
+**FBC Digital Systems**, unless otherwise stated.
 
-This repository represents proprietary research, engineering, and strategic development conducted under internal corporate confidentiality.
-
----
-
-## 🚫 Unauthorized Use Prohibited
-
-No individual or entity may:
-
-- Copy, modify, distribute, publish, or sublicense any part of this repository  
-- Reverse engineer system logic or AI models  
-- Use strategic or financial frameworks for external commercial activity  
-- Present FBC systems or documentation as derivative or competing works  
-
-**Without explicit written authorization from FBC Digital Systems Executive Governance.**
-
-Unauthorized usage constitutes a violation of international intellectual property and trade secret protection laws.
+This repository represents proprietary research and development work
+conducted internally for the purpose of building advanced urban
+intelligence systems.
 
 ---
 
-## 🧠 Patent & Trade Secret Notice
+## 🚫 Usage Restrictions
 
-Key integrated technologies — including but not limited to:
+Unless explicitly authorized in writing by FBC Digital Systems,
+no individual or organization may:
 
-- Urban Revenue AI Optimization Engines  
-- City-OS Master Kernel Architecture  
-- Secure Ledger & Audit Cryptographic Framework  
-- Global Expansion Simulation Systems  
-
-are classified as:
-
-- **Patent-Pending Technical Innovations**
-- **Protected Trade Secrets**
-- **Confidential Strategic Infrastructure**
-
-Disclosure of internal system logic is strictly restricted.
+- Reproduce, distribute, or publicly publish this material  
+- Modify or create derivative works for commercial purposes  
+- Reverse engineer proprietary system logic or architectures  
+- Use strategic, financial, or technical frameworks outside
+  authorized evaluation or partnership contexts  
 
 ---
 
-## 🛡️ Confidentiality & Non-Disclosure
+## 🧠 Trade Secrets & Innovation Protection
 
-By accessing this repository, the viewer acknowledges:
+Certain components of this repository may constitute:
 
-- All materials are confidential  
-- Access is granted solely for authorized review  
-- No disclosure to third parties is permitted  
-- No screenshots, recordings, or redistributions are allowed  
+- Confidential technical know-how  
+- Proprietary system architectures  
+- Trade secrets under applicable law  
 
-Violation triggers immediate revocation of access and potential legal action.
-
----
-
-## 🌍 Jurisdiction & Legal Governance
-
-FBC Digital Systems operates under multi-jurisdictional technology and data-sovereignty compliance frameworks.
-
-All disputes, claims, or legal proceedings shall be governed under applicable international intellectual property protection conventions and corporate governance law.
+These elements are disclosed solely for controlled review,
+evaluation, or collaboration purposes.
 
 ---
 
-## 🔐 Cryptographic Verification
+## 🛡️ Confidentiality Notice
 
-System audit logs, financial records, and internal transactions are protected through:
+Access to this repository implies acknowledgment that:
 
-- SHA-256 cryptographic hashing  
-- Immutable ledger recording  
-- Internal salted integrity proofs  
+- The materials may contain confidential information  
+- No unauthorized disclosure or redistribution is permitted  
+- Contents are shared on a need-to-know basis  
 
-**Security Status:** VERIFIED & ACTIVE
+This notice does not grant any license or ownership rights.
+
+---
+
+## 🌍 Jurisdiction & Governance
+
+FBC Digital Systems operates in accordance with applicable
+international intellectual property, data protection,
+and corporate governance regulations.
+
+Legal interpretation of this notice shall be governed by
+relevant international IP frameworks and applicable law.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This repository contains simulation frameworks, strategic projections, and prototype systems.  
-All financial projections and operational models are forward-looking internal research tools and do not represent public financial offerings.
+All systems, simulations, and projections contained in this
+repository are provided for research, development, and
+demonstration purposes only.
+
+They do not constitute financial advice, investment offers,
+or binding commercial commitments.
 
 ---
 
-## 📅 Legal Status
+## 📅 Repository Classification
 
-**Repository Classification:** CONFIDENTIAL — INTERNAL STRATEGIC IP  
-**Access Level:** Executive / Engineering / Authorized Partners Only  
-**Last Legal Review:** 2026-01-27  
+**Status:** Proprietary & Confidential  
+**Access Level:** Authorized Reviewers and Partners  
+**Last Review:** 2026-01-27  
 
 ---
 
 © 2026 FBC Digital Systems  
-**All Rights Reserved. Unauthorized use prohibited.**
+All rights reserved.
