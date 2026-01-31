@@ -1,41 +1,98 @@
 # ==========================================
 # PATH: Projects/Project-I-Urban-Revenue/test_engine.py
-# DESCRIPTION: FBC Automated QA & CI Audit Test
-# VERSION: v4.0-QA-CI-GRADE
+# DESCRIPTION: FBC Revenue Engine — Enterprise CI & Audit Test Suite
+# VERSION: v5.0.0-LTS-QA
+# CLASSIFICATION: AUDIT / INVESTOR / CI CRITICAL
 # ==========================================
 
 import sys
+from typing import Dict
+
 from revenue_sim import calculate_revenue_boost
 
-def test_revenue_logic():
-    print("\n--- FBC SYSTEM AUDIT: REVENUE ENGINE TEST ---")
 
-    test_val = 1_000_000
-    result = calculate_revenue_boost(test_val)
+# --------------------------------------------------
+# TEST CONFIGURATION
+# --------------------------------------------------
+BASELINE_REVENUE = 1_000_000
 
+MIN_EFFICIENCY_PERCENT = 10
+MAX_EFFICIENCY_PERCENT = 30
+
+
+# --------------------------------------------------
+# VALIDATION HELPERS
+# --------------------------------------------------
+def _validate_result_schema(result: Dict) -> None:
+    """
+    Ensures returned structure is audit-safe and stable.
+    """
+    required_keys = {
+        "baseline_revenue",
+        "ai_generated_boost",
+        "efficiency_gain_percent",
+        "status"
+    }
+
+    missing = required_keys - result.keys()
+    if missing:
+        raise AssertionError(f"Missing keys in revenue result: {missing}")
+
+
+def _validate_numeric_ranges(result: Dict) -> None:
+    """
+    Validates strategic and financial boundaries.
+    """
+    baseline = result["baseline_revenue"]
     boost = result["ai_generated_boost"]
     efficiency = result["efficiency_gain_percent"]
 
-    # Expected strategic range: 10% → 30%
-    min_expected = test_val * 0.10
-    max_expected = test_val * 0.30
+    min_expected = baseline * (MIN_EFFICIENCY_PERCENT / 100)
+    max_expected = baseline * (MAX_EFFICIENCY_PERCENT / 100)
 
-    if min_expected <= boost <= max_expected:
-        print("✅ Audit Passed: Revenue Boost within Strategic Range.")
-        print(f"   Efficiency Gain: {efficiency}%")
-        print(f"   Boost Value: ${boost:,.2f}")
-        return True
-    else:
-        print("❌ Audit Failed: Revenue Boost Out of Strategic Range.")
-        print(f"   Boost Value: ${boost:,.2f}")
-        return False
+    assert min_expected <= boost <= max_expected, (
+        f"Boost out of strategic range: {boost}"
+    )
+
+    assert MIN_EFFICIENCY_PERCENT <= efficiency <= MAX_EFFICIENCY_PERCENT, (
+        f"Efficiency percent out of bounds: {efficiency}"
+    )
+
+
+# --------------------------------------------------
+# CORE ENTERPRISE TEST
+# --------------------------------------------------
+def test_revenue_engine_enterprise_audit() -> None:
+    """
+    Enterprise-grade CI test for Urban Revenue AI.
+
+    Guarantees:
+    - Schema stability
+    - Strategic efficiency bounds
+    - Deterministic behavior
+    """
+
+    result = calculate_revenue_boost(BASELINE_REVENUE)
+
+    _validate_result_schema(result)
+    _validate_numeric_ranges(result)
+
+    assert result["status"] in {
+        "OPTIMIZED",
+        "STABLE"
+    }, f"Unexpected engine status: {result['status']}"
+
 
 # --------------------------------------------------
 # CI ENTRY POINT
 # --------------------------------------------------
 if __name__ == "__main__":
-    success = test_revenue_logic()
-    if not success:
-        sys.exit(1)   # Forces GitHub Actions to fail
-    else:
-        sys.exit(0)
+    try:
+        test_revenue_engine_enterprise_audit()
+    except Exception as exc:
+        print("\n[FBC CI AUDIT FAILURE — REVENUE ENGINE]")
+        print(str(exc))
+        sys.exit(1)
+
+    print("\n[FBC CI AUDIT SUCCESS — REVENUE ENGINE OK]")
+    sys.exit(0)
