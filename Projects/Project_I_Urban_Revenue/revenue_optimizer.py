@@ -1,43 +1,42 @@
 # ==========================================
 # PATH: Projects/Project_I_Urban_Revenue/revenue_optimizer.py
 # DESCRIPTION: FBC Urban Revenue Optimization Orchestrator
-# VERSION: v5.0.0-LTS-ENTERPRISE
-# CLASSIFICATION: PRODUCTION / AUDIT / CI CRITICAL
-# ROLE: ORCHESTRATOR (NON-COMPUTATIONAL)
+# VERSION: v6.0.0-ENTERPRISE-MAX-LTS
+# CLASSIFICATION: PRODUCTION / AUDIT / CI-CRITICAL
+# ROLE: ORCHESTRATION + CONTRACT STABILITY LAYER
+# DATA MODE: SIMULATION / DETERMINISTIC WHEN PROVIDED
 # ==========================================
 
 from datetime import datetime
 from typing import Dict, Optional
 
-# Package-safe relative import (CI SAFE)
 from .revenue_sim import calculate_revenue_boost
 
 
-ENGINE_VERSION = "REVENUE-OPTIMIZER-v5.0.0-LTS"
-ENGINE_ROLE = "CITY_REVENUE_ORCHESTRATOR"
-DATA_MODE = "DETERMINISTIC_SIMULATION"
+ENGINE_VERSION = "REVENUE-OPTIMIZER-v6.0.0-ENTERPRISE-MAX"
+ENGINE_ROLE = "URBAN_REVENUE_CONTRACT_ORCHESTRATOR"
+DATA_MODE = "SIMULATION"
 
 
 class RevenueOptimizer:
     """
     Enterprise-grade Revenue Optimization Orchestrator.
 
-    Responsibilities:
-    - City-level revenue orchestration
-    - Delegates financial math to revenue_sim (single source of truth)
-    - Adds governance, context, and audit metadata
-    - Preserves strict backward compatibility
+    This layer:
+    - Preserves contract stability across engine versions
+    - Normalizes financial schemas for City-OS & CI
+    - Delegates all math to revenue_sim without mutation
     """
 
     def __init__(self, city_name: str):
-        if not city_name or not isinstance(city_name, str):
-            raise ValueError("City name must be a non-empty string")
+        if not isinstance(city_name, str) or not city_name.strip():
+            raise ValueError("city_name must be a valid non-empty string")
 
         self.city_name = city_name
         self.engine_version = ENGINE_VERSION
 
     # --------------------------------------------------
-    # PUBLIC CONTRACT (ENTERPRISE STABLE)
+    # PUBLIC ENTERPRISE CONTRACT
     # --------------------------------------------------
     def project_incremental_gain(
         self,
@@ -48,9 +47,9 @@ class RevenueOptimizer:
         Projects incremental revenue gain for a city.
 
         Guarantees:
-        - No mutation of core financial logic
-        - Deterministic output (when efficiency provided)
-        - CI-safe schema
+        - Zero mutation of core revenue logic
+        - Backward + forward compatible schema
+        - CI-safe deterministic output
         """
 
         result = calculate_revenue_boost(
@@ -58,40 +57,60 @@ class RevenueOptimizer:
             efficiency_gain=efficiency_gain
         )
 
+        # ---- BASELINE NORMALIZATION (CRITICAL) ----
+        baseline_revenue = result.get(
+            "original_revenue",
+            result.get("baseline_revenue", float(base_revenue))
+        )
+
         return {
-            # ---- CITY CONTEXT ----
+            # --------------------------------------------------
+            # CONTEXT
+            # --------------------------------------------------
             "city": self.city_name,
 
-            # ---- CORE FINANCIALS (PASSTHROUGH) ----
-            "original_revenue": result["original_revenue"],
+            # --------------------------------------------------
+            # CORE FINANCIAL METRICS (CONTRACT-STABLE)
+            # --------------------------------------------------
+            "original_revenue": baseline_revenue,
+            "baseline_revenue": baseline_revenue,
             "ai_generated_boost": result["ai_generated_boost"],
             "total_optimized_revenue": result["total_optimized_revenue"],
             "efficiency_gain_percent": result["efficiency_gain_percent"],
 
-            # ---- STATUS ----
+            # --------------------------------------------------
+            # STATUS
+            # --------------------------------------------------
             "status": result["status"],
 
-            # ---- GOVERNANCE METADATA ----
+            # --------------------------------------------------
+            # GOVERNANCE & AUDIT
+            # --------------------------------------------------
             "engine_version": self.engine_version,
             "engine_role": ENGINE_ROLE,
             "data_mode": DATA_MODE,
             "timestamp_utc": datetime.utcnow().isoformat(),
 
-            # ---- FORMATTED OUTPUT (DASHBOARD SAFE) ----
+            # --------------------------------------------------
+            # FORMATTED OUTPUT (DASHBOARD SAFE)
+            # --------------------------------------------------
             "formatted": result["formatted"]
         }
 
 
 # --------------------------------------------------
-# STANDALONE ENTERPRISE SELF-TEST (CI SAFE)
+# ENTERPRISE SELF-TEST (CI SAFE)
 # --------------------------------------------------
 if __name__ == "__main__":
-    print("\n--- FBC REVENUE OPTIMIZER ENTERPRISE SELF-TEST ---")
+    print("\n--- FBC REVENUE OPTIMIZER ENTERPRISE MAX TEST ---")
 
-    optimizer = RevenueOptimizer("New York")
-    report = optimizer.project_incremental_gain(1_000_000)
+    optimizer = RevenueOptimizer("Enterprise-Test-City")
+    report = optimizer.project_incremental_gain(
+        base_revenue=1_000_000,
+        efficiency_gain=0.20
+    )
 
     for key, value in report.items():
         print(f"{key}: {value}")
 
-    print("--- REVENUE OPTIMIZER OPERATIONAL ---\n")
+    print("--- REVENUE OPTIMIZER ENTERPRISE MAX OPERATIONAL ---\n")
