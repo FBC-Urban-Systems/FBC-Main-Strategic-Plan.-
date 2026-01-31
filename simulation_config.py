@@ -1,8 +1,10 @@
 # =========================================================
 # PATH: /simulation_config.py
 # DESCRIPTION: Global Simulation Configuration Core
-# VERSION: v3.0.0 — REAL DATA VERIFIED • FUTURE READY
+# VERSION: v3.0.0 (ENTERPRISE STABLE)
+# CLASSIFICATION: PRODUCTION / AUDIT / CI-SAFE
 # ROLE: Deterministic, Auditable Master Parameters Layer
+# DATA MODE: REALISTIC-DETERMINISTIC
 # =========================================================
 
 from dataclasses import dataclass
@@ -20,6 +22,11 @@ class CityNode:
     """
     Immutable configuration object representing
     a single city simulation node.
+
+    Guarantees:
+    - Fully immutable (frozen dataclass)
+    - Serializable & audit-safe
+    - Deterministic input contract
     """
     name: str
     country_code: str
@@ -36,7 +43,11 @@ def load_population(country_code: str, fallback: int) -> int:
     """
     Attempts to fetch real population data.
     Falls back gracefully to predefined values
-    to ensure simulation stability.
+    to guarantee simulation continuity.
+
+    Rules:
+    - No hard dependency on external availability
+    - Always returns a valid integer
     """
     try:
         data = get_country_population(country_code)
