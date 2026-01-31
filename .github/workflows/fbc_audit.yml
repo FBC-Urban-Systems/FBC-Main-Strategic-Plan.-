@@ -1,4 +1,4 @@
-name: FBC SUPREME CONTINUOUS SYSTEM AUDIT v5.0 — REAL DATA LOCKED
+name: FBC SUPREME CONTINUOUS SYSTEM AUDIT v6.0 — ENTERPRISE LOCK
 
 on:
   push:
@@ -9,18 +9,18 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  FBC_SYSTEM_VERSION: "SUPREME-v5.0"
+  FBC_SYSTEM_VERSION: "SUPREME-v6.0"
   FBC_DATA_MODE: "REAL"
   PYTHONPATH: ${{ github.workspace }}
 
 # ======================================================
-# 1. SECURITY & DEPENDENCY GOVERNANCE LAYER
+# 1. SECURITY & SUPPLY CHAIN GOVERNANCE
 # ======================================================
 jobs:
   security-governance:
-    name: 🛡️ Security & Dependency Governance
+    name: 🛡️ Security & Supply Chain Governance
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
 
     steps:
       - uses: actions/checkout@v4
@@ -30,30 +30,28 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Audit Toolchain
+      - name: Install Security Toolchain
         run: |
           python -m pip install --upgrade pip
           pip install bandit pip-audit
 
-      - name: Static Security Scan (Supreme Controlled)
+      - name: Static Security Scan (High Confidence Only)
         run: |
           bandit -r . \
             --severity-level high \
-            --confidence-level high \
-            --exit-zero
+            --confidence-level high
 
       - name: Dependency Vulnerability Audit
         run: |
-          pip-audit || true
+          pip-audit --progress-spinner off
 
 # ======================================================
-# 2. CORE ENGINE INTEGRITY LAYER
+# 2. CORE ENGINE VERIFICATION
 # ======================================================
   engine-integrity:
-    name: 🧠 Core Engine Integrity Check
+    name: 🧠 Core Engine Verification
     runs-on: ubuntu-latest
     needs: security-governance
-    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
@@ -63,27 +61,25 @@ jobs:
           cache: pip
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Import-Test All AI Engines
+      - name: Verify AI Engines Importability
         run: |
           python - <<EOF
           from Projects.Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
           from Projects.Project_II_Private_Districts.energy_forecast import predict_energy_savings
           from Projects.Project_III_Traffic_Intelligence.accident_pred import TrafficRiskEngine
           from Projects.Project_III_Security_Ledger.secure_vault import FBCSecureVault
-          print("✅ CORE AI ENGINES: OK (REAL DATA)")
+          print("CORE ENGINES VERIFIED")
           EOF
 
 # ======================================================
-# 3. DATA CORE INTEGRITY LAYER
+# 3. DATA CORE VERIFICATION
 # ======================================================
   data-core-integrity:
-    name: 🗄️ Data Core Integrity Check
+    name: 🗄️ Data Core Verification
     runs-on: ubuntu-latest
     needs: engine-integrity
-    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
@@ -93,24 +89,22 @@ jobs:
           cache: pip
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Import-Test Data Core
+      - name: Verify Data Core Interfaces
         run: |
           python - <<EOF
           from data_core import fetch_all_results, store_simulation_result
-          print("✅ DATA CORE: OK (REAL MODE)")
+          print("DATA CORE VERIFIED")
           EOF
 
 # ======================================================
-# 4. API KERNEL INTEGRITY LAYER
+# 4. API KERNEL VERIFICATION
 # ======================================================
   api-kernel-integrity:
-    name: 🌐 API Kernel Integrity Check
+    name: 🌐 API Kernel Verification
     runs-on: ubuntu-latest
     needs: data-core-integrity
-    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
@@ -120,24 +114,22 @@ jobs:
           cache: pip
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Import-Test API Kernel
+      - name: Verify API Kernel
         run: |
           python - <<EOF
           import api_kernel
-          print("✅ API KERNEL: OK")
+          print("API KERNEL VERIFIED")
           EOF
 
 # ======================================================
-# 5. STREAMLIT APP INTEGRITY LAYER
+# 5. APPLICATION LAYER VERIFICATION
 # ======================================================
   app-integrity:
-    name: 🖥️ Streamlit App Integrity Check
+    name: 🖥️ Application Layer Verification
     runs-on: ubuntu-latest
     needs: api-kernel-integrity
-    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
@@ -147,24 +139,22 @@ jobs:
           cache: pip
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Import-Test App
+      - name: Verify Streamlit App
         run: |
           python - <<EOF
           import app
-          print("✅ STREAMLIT APP: OK")
+          print("APPLICATION VERIFIED")
           EOF
 
 # ======================================================
-# 6. PDF REPORT ENGINE INTEGRITY LAYER
+# 6. REPORTING ENGINE VERIFICATION
 # ======================================================
   report-engine-integrity:
-    name: 📄 Report Engine Integrity Check
+    name: 📄 Reporting Engine Verification
     runs-on: ubuntu-latest
     needs: app-integrity
-    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
@@ -174,21 +164,20 @@ jobs:
           cache: pip
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Import-Test PDF Report Engine
+      - name: Verify PDF Report Engine
         run: |
           python - <<EOF
           from reports.pdf_report_generator import generate_fbc_report
-          print("✅ PDF REPORT ENGINE: OK")
+          print("REPORT ENGINE VERIFIED")
           EOF
 
 # ======================================================
-# 7. EXECUTIVE SYSTEM CERTIFICATE
+# 7. SYSTEM CERTIFICATION & ATTESTATION
 # ======================================================
   executive-certificate:
-    name: 🏆 Executive System Certificate
+    name: 🏆 System Certification & Attestation
     runs-on: ubuntu-latest
     needs:
       [
@@ -201,18 +190,20 @@ jobs:
       ]
 
     steps:
-      - name: Generate Supreme Certificate
+      - name: Generate System Certificate
         run: |
-          echo "============================================" > FBC_SYSTEM_CERTIFICATE.txt
-          echo "FBC URBAN INTELLIGENCE SYSTEM CERTIFICATE" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "SYSTEM VERSION: $FBC_SYSTEM_VERSION" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "DATA MODE: REAL" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "AUDIT STATUS: ALL LAYERS VERIFIED" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "TIMESTAMP (UTC): $(date -u)" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "CERTIFICATION: SUPREME OPERATIONAL" >> FBC_SYSTEM_CERTIFICATE.txt
-          echo "============================================" >> FBC_SYSTEM_CERTIFICATE.txt
+          {
+            echo "============================================"
+            echo "FBC URBAN INTELLIGENCE SYSTEM CERTIFICATE"
+            echo "SYSTEM VERSION: $FBC_SYSTEM_VERSION"
+            echo "DATA MODE: $FBC_DATA_MODE"
+            echo "AUDIT STATUS: ALL LAYERS VERIFIED"
+            echo "TIMESTAMP (UTC): $(date -u)"
+            echo "CERTIFICATION: ENTERPRISE OPERATIONAL"
+            echo "============================================"
+          } > FBC_SYSTEM_CERTIFICATE.txt
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FBC_SUPREME_SYSTEM_CERTIFICATE
+          name: FBC_SYSTEM_CERTIFICATE
           path: FBC_SYSTEM_CERTIFICATE.txt
