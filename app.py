@@ -1,186 +1,174 @@
-# ==========================================
+# ==========================================================
 # PATH: /app.py
-# DESCRIPTION: FBC Global Command Center
-# VERSION: v6.0.0 REAL-DATA + PDF-DEMO
-# ==========================================
+# DESCRIPTION: FBC Global Command Center (Unified Interface)
+# VERSION: v7.0.0 — REAL DATA LOCKED • FUTURE PROOF
+# ROLE: Executive Control Panel for All FBC Intelligence Engines
+# ==========================================================
 
-import streamlit as st
 import os
-
-# ==========================================
-# PATH INTEGRATION
-# ==========================================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECTS_PATH = os.path.join(BASE_DIR, "Projects")
-REPORTS_PATH = os.path.join(BASE_DIR, "reports")
-
-os.makedirs(REPORTS_PATH, exist_ok=True)
-
 import sys
-sys.path.append(PROJECTS_PATH)
+import streamlit as st
 
-# ==========================================
-# IMPORT REAL-DATA ENGINES
-# ==========================================
+# ==========================================================
+# PATH SETUP (SAFE & DETERMINISTIC)
+# ==========================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECTS_DIR = os.path.join(BASE_DIR, "Projects")
+REPORTS_DIR = os.path.join(BASE_DIR, "reports")
+
+os.makedirs(REPORTS_DIR, exist_ok=True)
+sys.path.insert(0, PROJECTS_DIR)
+
+# ==========================================================
+# REAL DATA ENGINE IMPORTS (CONTRACT SAFE)
+# ==========================================================
 from Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
-from Project_II_Private_Districts.energy_forecast import EnergyForecaster
+from Project_II_Private_Districts.energy_forecast import predict_energy_savings
 from Project_III_Traffic_Intelligence.accident_pred import TrafficRiskEngine
 
-# PDF Generator
 from reports.pdf_report_generator import generate_fbc_report
 
-# ==========================================
+# ==========================================================
 # STREAMLIT CONFIG
-# ==========================================
-st.set_page_config(page_title="FBC Global Command Center", layout="wide")
+# ==========================================================
+st.set_page_config(
+    page_title="FBC Global Command Center",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 st.title("🌍 FBC Global Command Center")
-st.caption("Real-Data Urban Intelligence Platform")
+st.caption("Supreme Real-Data Urban Intelligence Platform")
 
 st.markdown("---")
 
-# ==========================================
-# SIDEBAR
-# ==========================================
-mode = st.sidebar.radio(
-    "Select Module",
-    [
-        "Traffic Risk Analysis",
-        "Revenue Forecast",
-        "Energy Forecast"
-    ]
+# ==========================================================
+# SIDEBAR NAVIGATION
+# ==========================================================
+module = st.sidebar.radio(
+    "Select Intelligence Module",
+    (
+        "🚦 Traffic Risk Analysis",
+        "💰 Revenue Projection",
+        "⚡ Energy Savings Forecast",
+    ),
 )
 
-# ==========================================
-# MODULE 1 — TRAFFIC
-# ==========================================
-if mode == "Traffic Risk Analysis":
+# ==========================================================
+# MODULE 1 — TRAFFIC RISK
+# ==========================================================
+if module.startswith("🚦"):
+    st.header("🚦 Real-Time Traffic Risk Intelligence")
 
-    st.header("🚦 Real-Time Traffic Risk Engine")
-
-    city = st.text_input("City Name", "Cairo")
+    city = st.text_input("City Name", value="Cairo")
     density = st.slider("Traffic Density Index", 0, 300, 120)
 
-    if st.button("Run Traffic Analysis"):
-
+    if st.button("Run Traffic Analysis", type="primary"):
         engine = TrafficRiskEngine(city)
         result = engine.analyze_real_time_risk(density)
 
-        st.success("Analysis Completed")
+        st.success("Traffic Analysis Completed")
 
         st.metric("Risk Score", result["risk_score"])
-        st.write("Weather:", result["weather"])
+        st.write("Weather Condition:", result["weather"])
 
-        # PDF Button
         if st.button("📄 Generate PDF Report"):
-            report_data = {
-                "City": result["city"],
-                "Traffic Density": result["traffic_density"],
-                "Weather Condition": result["weather"],
-                "Risk Score": result["risk_score"]
-            }
-
-            output_file = os.path.join(REPORTS_PATH, f"Traffic_Report_{city}.pdf")
-            pdf_result = generate_fbc_report(
+            pdf_path = os.path.join(REPORTS_DIR, f"Traffic_Report_{city}.pdf")
+            generate_fbc_report(
                 "Traffic Risk Analysis Report",
-                report_data,
-                output_file
+                {
+                    "City": city,
+                    "Traffic Density": density,
+                    "Weather": result["weather"],
+                    "Risk Score": result["risk_score"],
+                },
+                pdf_path,
             )
 
-            st.success(pdf_result["status"])
-            with open(output_file, "rb") as f:
+            with open(pdf_path, "rb") as f:
                 st.download_button(
                     "⬇️ Download PDF",
                     data=f,
-                    file_name=f"Traffic_Report_{city}.pdf"
+                    file_name=os.path.basename(pdf_path),
                 )
 
-# ==========================================
+# ==========================================================
 # MODULE 2 — REVENUE
-# ==========================================
-elif mode == "Revenue Forecast":
+# ==========================================================
+elif module.startswith("💰"):
+    st.header("💰 GDP-Based Urban Revenue Projection")
 
-    st.header("💰 Real GDP-Based Revenue Engine")
+    city = st.text_input("City Name", value="Cairo")
+    annual_revenue = st.number_input(
+        "Current Annual City Revenue (USD)",
+        min_value=0.0,
+        value=5_000_000.0,
+        step=100_000.0,
+    )
 
-    country_code = st.text_input("Country Code (EG, US, AE)", "EG")
+    if st.button("Run Revenue Projection", type="primary"):
+        engine = RevenueOptimizer(city)
+        result = engine.project_incremental_gain(annual_revenue)
 
-    if st.button("Run Revenue Forecast"):
+        st.success("Revenue Projection Completed")
 
-        engine = RevenueOptimizer(country_code)
-        result = engine.project_incremental_gain()
+        st.metric("Projected Total Gain", f"${result['Total_City_Gain']:,.2f}")
 
-        if "error" in result:
-            st.error(result["error"])
-        else:
-            st.success("Forecast Completed")
+        if st.button("📄 Generate PDF Report"):
+            pdf_path = os.path.join(REPORTS_DIR, f"Revenue_Report_{city}.pdf")
+            generate_fbc_report(
+                "Urban Revenue Projection Report",
+                result,
+                pdf_path,
+            )
 
-            st.metric("GDP Per Capita", f"${result['gdp_per_capita']:,.2f}")
-            st.metric("Estimated City Revenue", f"${result['estimated_city_revenue']:,.2f}")
-            st.metric("FBC Projected Gain", f"${result['fbc_projected_gain']:,.2f}")
-
-            # PDF Button
-            if st.button("📄 Generate PDF Report"):
-                report_data = result
-
-                output_file = os.path.join(REPORTS_PATH, f"Revenue_Report_{country_code}.pdf")
-                pdf_result = generate_fbc_report(
-                    "Revenue Forecast Report",
-                    report_data,
-                    output_file
+            with open(pdf_path, "rb") as f:
+                st.download_button(
+                    "⬇️ Download PDF",
+                    data=f,
+                    file_name=os.path.basename(pdf_path),
                 )
 
-                st.success(pdf_result["status"])
-                with open(output_file, "rb") as f:
-                    st.download_button(
-                        "⬇️ Download PDF",
-                        data=f,
-                        file_name=f"Revenue_Report_{country_code}.pdf"
-                    )
-
-# ==========================================
+# ==========================================================
 # MODULE 3 — ENERGY
-# ==========================================
+# ==========================================================
 else:
+    st.header("⚡ Energy Cost Optimization & Savings")
 
-    st.header("⚡ Real Energy Cost & Savings Engine")
+    annual_energy_bill = st.number_input(
+        "Annual Energy Bill (USD)",
+        min_value=0.0,
+        value=150_000.0,
+        step=10_000.0,
+    )
 
-    country_code = st.text_input("Country Code (EG, US, AE)", "EG")
+    if st.button("Run Energy Forecast", type="primary"):
+        result = predict_energy_savings(annual_energy_bill)
 
-    if st.button("Run Energy Forecast"):
+        st.success("Energy Forecast Completed")
 
-        engine = EnergyForecaster(country_code)
-        result = engine.forecast()
+        st.metric(
+            "AI Predicted Savings",
+            f"${result['ai_predicted_savings']:,.2f}",
+        )
 
-        if "error" in result:
-            st.error(result["error"])
-        else:
-            st.success("Forecast Completed")
+        if st.button("📄 Generate PDF Report"):
+            pdf_path = os.path.join(REPORTS_DIR, "Energy_Report.pdf")
+            generate_fbc_report(
+                "Energy Savings Forecast Report",
+                result,
+                pdf_path,
+            )
 
-            st.metric("Electricity Price (USD/kWh)", result["price_per_kwh"])
-            st.metric("Total National Energy Cost", f"${result['total_energy_cost_usd']:,.2f}")
-            st.metric("FBC Projected Savings", f"${result['fbc_projected_savings']:,.2f}")
-
-            # PDF Button
-            if st.button("📄 Generate PDF Report"):
-                report_data = result
-
-                output_file = os.path.join(REPORTS_PATH, f"Energy_Report_{country_code}.pdf")
-                pdf_result = generate_fbc_report(
-                    "Energy Forecast Report",
-                    report_data,
-                    output_file
+            with open(pdf_path, "rb") as f:
+                st.download_button(
+                    "⬇️ Download PDF",
+                    data=f,
+                    file_name=os.path.basename(pdf_path),
                 )
 
-                st.success(pdf_result["status"])
-                with open(output_file, "rb") as f:
-                    st.download_button(
-                        "⬇️ Download PDF",
-                        data=f,
-                        file_name=f"Energy_Report_{country_code}.pdf"
-                    )
-
-# ==========================================
+# ==========================================================
 # FOOTER
-# ==========================================
+# ==========================================================
 st.markdown("---")
-st.caption("© 2026 FBC Digital Systems — Real Data Urban Intelligence Platform")
+st.caption("© 2026 FBC Digital Systems — REAL DATA • AUDIT READY • FUTURE PROOF")
