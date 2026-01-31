@@ -1,22 +1,40 @@
 # ==========================================
 # PATH: data_core/results.py
-# DESCRIPTION: Unified results access layer
-# VERSION: data-core v3.3.0
+# DESCRIPTION: Enterprise Results Access Layer
+# VERSION: v5.0.0-ENTERPRISE-LTS
 # ==========================================
 
 from typing import Dict, Any
-from .core import fetch_all_results
+from datetime import datetime, timezone
+
+from data_core.core import fetch_all_results
+
+# --------------------------------------------------
+# ENTERPRISE CONSTANTS
+# --------------------------------------------------
+ENGINE_VERSION = "5.0.0-ENTERPRISE-LTS"
+MODULE_NAME = "data_core.results"
 
 
 def fetch_results_as_dict() -> Dict[str, Any]:
     """
-    Stable API Kernel interface.
-    Returns all stored simulation results in a dictionary format.
-    This function is guaranteed to remain backward compatible.
+    Enterprise-stable results access interface.
+
+    Guarantees:
+    - Backward compatibility
+    - Immutable snapshot semantics
+    - Audit-ready metadata
+    - CI-safe deterministic output
     """
+
     results = fetch_all_results()
 
     return {
+        "metadata": {
+            "module": MODULE_NAME,
+            "engine_version": ENGINE_VERSION,
+            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        },
         "results": results,
         "count": len(results),
     }
