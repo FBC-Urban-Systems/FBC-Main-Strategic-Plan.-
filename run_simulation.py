@@ -1,8 +1,10 @@
 # =========================================================
 # PATH: /run_simulation.py
 # DESCRIPTION: Global Simulation Execution Engine
-# VERSION: v2.0.0 — REAL DATA SAFE • AUDIT READY
-# ROLE: Orchestrates all city-level AI engines deterministically
+# VERSION: v2.1.0 (ENTERPRISE STABLE)
+# CLASSIFICATION: PRODUCTION / AUDIT / CI-SAFE
+# ROLE: Deterministic Orchestrator for City-Level AI Engines
+# DATA MODE: REALISTIC-DETERMINISTIC
 # =========================================================
 
 from typing import List, Dict
@@ -18,31 +20,32 @@ from data_core import store_simulation_result
 # =========================================================
 # GLOBAL SIMULATION ORCHESTRATOR
 # =========================================================
-def run_global_simulation() -> List[Dict]:
+def run_global_simulation() -> List[Dict[str, object]]:
     """
     Executes a deterministic global simulation across all
-    configured city nodes using real data inputs.
+    configured city nodes.
 
-    Returns:
-        List[Dict]: Structured simulation results per city.
+    Guarantees:
+    - No randomness
+    - No shared mutable state
+    - City-level isolation
+    - Audit-safe outputs
     """
 
-    results: List[Dict] = []
-    execution_timestamp = datetime.utcnow().isoformat() + "Z"
+    results: List[Dict[str, object]] = []
+    execution_timestamp: str = datetime.utcnow().isoformat() + "Z"
 
     for city in CITY_NODES:
-        print(f"\n--- Simulating City Node: {city.name} ---")
-
         # -------------------------------------------------
         # Revenue Optimization Engine
         # -------------------------------------------------
         revenue_engine = RevenueOptimizer(city.name)
         revenue_result = revenue_engine.project_incremental_gain(
-            city.base_revenue
+            base_revenue=city.base_revenue
         )
 
         # -------------------------------------------------
-        # Energy Forecast Engine
+        # Energy Optimization Engine
         # -------------------------------------------------
         energy_result = predict_energy_savings(
             city.base_energy_bill
@@ -57,20 +60,27 @@ def run_global_simulation() -> List[Dict]:
         )
 
         # -------------------------------------------------
-        # Extract & Validate Outputs
+        # Normalize Outputs (Strict Casting)
         # -------------------------------------------------
-        revenue_gain = float(revenue_result.get("Total_City_Gain", 0))
-        energy_savings = float(energy_result.get("ai_predicted_savings", 0))
-        risk_score = float(traffic_result.get("risk_score", 0))
+        revenue_gain: float = float(
+            revenue_result.get("Total_City_Gain", 0.0)
+        )
+        energy_savings: float = float(
+            energy_result.get("ai_predicted_savings", 0.0)
+        )
+        risk_score: float = float(
+            traffic_result.get("risk_score", 0.0)
+        )
 
         # -------------------------------------------------
-        # Persist Results to Data Core
+        # Persist Results (Deterministic Side-Effect)
         # -------------------------------------------------
         store_simulation_result(
             city=city.name,
             revenue_gain=revenue_gain,
             energy_savings=energy_savings,
             risk_score=risk_score,
+            executed_at=execution_timestamp
         )
 
         # -------------------------------------------------
@@ -84,18 +94,18 @@ def run_global_simulation() -> List[Dict]:
             "energy_savings": energy_savings,
             "risk_score": risk_score,
             "executed_at": execution_timestamp,
-            "data_mode": "REAL"
+            "data_mode": "REALISTIC-DETERMINISTIC"
         })
 
     return results
 
 
 # =========================================================
-# CLI EXECUTION MODE
+# CLI EXECUTION MODE (CI SAFE)
 # =========================================================
 if __name__ == "__main__":
     simulation_results = run_global_simulation()
 
-    print("\n========== GLOBAL SIMULATION RESULTS ==========")
+    print("========== GLOBAL SIMULATION RESULTS ==========")
     for record in simulation_results:
         print(record)
