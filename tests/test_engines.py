@@ -18,16 +18,6 @@ from Projects.Project_III_Security_Ledger.secure_vault import FBCSecureVault
 
 
 # =========================================================
-# PYTEST MARKERS (ENTERPRISE CLASSIFICATION)
-# =========================================================
-pytestmark = [
-    pytest.mark.contract,
-    pytest.mark.enterprise,
-    pytest.mark.ci_safe
-]
-
-
-# =========================================================
 # FIXTURES (DETERMINISTIC & SIDE-EFFECT FREE)
 # =========================================================
 @pytest.fixture(scope="module")
@@ -80,22 +70,19 @@ def test_traffic_engine_contract(test_city: str) -> None:
 
 
 # =========================================================
-# SECURITY LEDGER CONTRACT TEST
+# SECURITY LEDGER CONTRACT TEST (STRICT API COMPLIANCE)
 # =========================================================
 def test_secure_vault_contract() -> None:
     vault = FBCSecureVault()
 
-    proof: Dict[str, Any] = vault.generate_proof(
-        record_type="TEST",
-        entity_id="ENTITY",
-        value=12345
-    )
+    # IMPORTANT: positional args only (contract-safe)
+    proof: Dict[str, Any] = vault.generate_proof("TEST", "ENTITY", 12345)
 
     assert isinstance(proof, dict)
     assert "audit_hash" in proof
     assert isinstance(proof["audit_hash"], str)
 
-    # Contract-based forward compatibility
+    # Forward-compatible contract validation
     assert "status" in proof
     assert isinstance(proof["status"], str)
     assert proof["status"].upper().endswith("RECORD")
@@ -104,7 +91,6 @@ def test_secure_vault_contract() -> None:
 # =========================================================
 # SYSTEM-WIDE SMOKE TEST (NON-DESTRUCTIVE)
 # =========================================================
-@pytest.mark.smoke
 def test_system_smoke(test_city: str) -> None:
     """
     Validates that all core engines initialize and execute
