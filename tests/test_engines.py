@@ -1,14 +1,15 @@
 # =========================================================
 # PATH: tests/test_engines.py
-# DESCRIPTION: Core Engine Contract & Stability Tests
-# VERSION: v5.0.0-SUPREME — ENTERPRISE CI SAFE
-# ROLE: System Trust, Regression & Interface Validation
+# DESCRIPTION: Core Engine Contract, Stability & Trust Tests
+# VERSION: v5.0.0-ENTERPRISE-LTS
+# ROLE: System Integrity, Regression & Interface Validation
 # =========================================================
 
+from typing import Dict, Any
 import pytest
 
 # ---------------------------------------------------------
-# CORE ENGINE IMPORTS (CONTRACT LEVEL)
+# CORE ENGINE IMPORTS (CONTRACT LEVEL — DO NOT MOCK)
 # ---------------------------------------------------------
 from Projects.Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
 from Projects.Project_II_Private_Districts.energy_forecast import predict_energy_savings
@@ -17,12 +18,30 @@ from Projects.Project_III_Security_Ledger.secure_vault import FBCSecureVault
 
 
 # =========================================================
+# PYTEST MARKERS (ENTERPRISE CLASSIFICATION)
+# =========================================================
+pytestmark = [
+    pytest.mark.contract,
+    pytest.mark.enterprise,
+    pytest.mark.ci_safe
+]
+
+
+# =========================================================
+# FIXTURES (DETERMINISTIC & SIDE-EFFECT FREE)
+# =========================================================
+@pytest.fixture(scope="module")
+def test_city() -> str:
+    return "TestCity"
+
+
+# =========================================================
 # REVENUE ENGINE CONTRACT TEST
 # =========================================================
-def test_revenue_engine_contract():
-    engine = RevenueOptimizer("TestCity")
+def test_revenue_engine_contract(test_city: str) -> None:
+    engine = RevenueOptimizer(test_city)
 
-    result = engine.project_incremental_gain(1_000_000)
+    result: Dict[str, Any] = engine.project_incremental_gain(1_000_000)
 
     assert isinstance(result, dict)
     assert "Total_City_Gain" in result
@@ -33,60 +52,67 @@ def test_revenue_engine_contract():
 # =========================================================
 # ENERGY ENGINE CONTRACT TEST
 # =========================================================
-def test_energy_engine_contract():
-    result = predict_energy_savings(100_000)
+@pytest.mark.parametrize("baseline_usage", [10_000, 50_000, 100_000])
+def test_energy_engine_contract(baseline_usage: int) -> None:
+    result: Dict[str, Any] = predict_energy_savings(baseline_usage)
 
     assert isinstance(result, dict)
     assert "ai_predicted_savings" in result
     assert isinstance(result["ai_predicted_savings"], (int, float))
     assert result["ai_predicted_savings"] >= 0
     assert "confidence_level" in result
+    assert isinstance(result["confidence_level"], str)
 
 
 # =========================================================
 # TRAFFIC ENGINE CONTRACT TEST
 # =========================================================
-def test_traffic_engine_contract():
-    engine = TrafficRiskEngine("TestCity")
+def test_traffic_engine_contract(test_city: str) -> None:
+    engine = TrafficRiskEngine(test_city)
 
-    result = engine.analyze_real_time_risk(120)
+    result: Dict[str, Any] = engine.analyze_real_time_risk(120)
 
     assert isinstance(result, dict)
     assert "risk_score" in result
     assert isinstance(result["risk_score"], (int, float))
-    assert 0 <= result["risk_score"] <= 1
+    assert 0.0 <= result["risk_score"] <= 1.0
     assert "weather" in result
 
 
 # =========================================================
 # SECURITY LEDGER CONTRACT TEST
 # =========================================================
-def test_secure_vault_contract():
+def test_secure_vault_contract() -> None:
     vault = FBCSecureVault()
 
-    proof = vault.generate_proof("TEST", "ENTITY", 12345)
+    proof: Dict[str, Any] = vault.generate_proof(
+        record_type="TEST",
+        entity_id="ENTITY",
+        value=12345
+    )
 
     assert isinstance(proof, dict)
     assert "audit_hash" in proof
     assert isinstance(proof["audit_hash"], str)
 
-    # Contract-based validation (future-proof)
+    # Contract-based forward compatibility
     assert "status" in proof
     assert isinstance(proof["status"], str)
     assert proof["status"].upper().endswith("RECORD")
 
 
 # =========================================================
-# SYSTEM-WIDE SMOKE TEST
+# SYSTEM-WIDE SMOKE TEST (NON-DESTRUCTIVE)
 # =========================================================
-def test_system_smoke():
+@pytest.mark.smoke
+def test_system_smoke(test_city: str) -> None:
     """
     Validates that all core engines initialize and execute
     without raising runtime exceptions.
     """
 
-    RevenueOptimizer("SmokeCity")
-    TrafficRiskEngine("SmokeCity")
+    RevenueOptimizer(test_city)
+    TrafficRiskEngine(test_city)
     FBCSecureVault()
 
     energy = predict_energy_savings(10_000)
