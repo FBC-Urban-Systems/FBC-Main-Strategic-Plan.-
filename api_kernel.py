@@ -6,7 +6,7 @@
 # =========================================================
 
 from fastapi import FastAPI, HTTPException
-from typing import Dict, Any, List
+from typing import Dict, Any
 import sys
 import os
 
@@ -53,7 +53,10 @@ app = FastAPI(
 @app.get("/government/risk/{city}/{density}", response_model=Dict[str, Any])
 def get_city_risk(city: str, density: int):
     if density < 0:
-        raise HTTPException(status_code=400, detail="Traffic density must be non-negative")
+        raise HTTPException(
+            status_code=400,
+            detail="Traffic density must be non-negative"
+        )
 
     engine = TrafficRiskEngine(city)
     return engine.analyze_real_time_risk(density)
@@ -62,7 +65,10 @@ def get_city_risk(city: str, density: int):
 @app.get("/government/revenue/{city}/{annual_revenue}", response_model=Dict[str, Any])
 def get_revenue_projection(city: str, annual_revenue: float):
     if annual_revenue <= 0:
-        raise HTTPException(status_code=400, detail="Annual revenue must be positive")
+        raise HTTPException(
+            status_code=400,
+            detail="Annual revenue must be positive"
+        )
 
     optimizer = RevenueOptimizer(city)
     return optimizer.project_incremental_gain(annual_revenue)
@@ -73,7 +79,10 @@ def get_revenue_projection(city: str, annual_revenue: float):
 @app.get("/private/energy/{bill}", response_model=Dict[str, Any])
 def get_energy_savings(bill: float):
     if bill <= 0:
-        raise HTTPException(status_code=400, detail="Energy bill must be positive")
+        raise HTTPException(
+            status_code=400,
+            detail="Energy bill must be positive"
+        )
 
     return predict_energy_savings(bill)
 
@@ -83,7 +92,10 @@ def get_energy_savings(bill: float):
 @app.get("/ledger/proof/{project}/{entity}/{value}", response_model=Dict[str, Any])
 def generate_ledger_proof(project: str, entity: str, value: float):
     if value < 0:
-        raise HTTPException(status_code=400, detail="Ledger value must be non-negative")
+        raise HTTPException(
+            status_code=400,
+            detail="Ledger value must be non-negative"
+        )
 
     return vault.generate_proof(project, entity, value)
 
@@ -109,4 +121,4 @@ def root() -> Dict[str, str]:
         "status": "ONLINE",
         "data_mode": "REAL",
         "version": "v3.0.0",
-    }
+}
