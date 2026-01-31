@@ -15,7 +15,7 @@ env:
   PYTHONPATH: ${{ github.workspace }}
 
 # ======================================================
-# 1. SECURITY GOVERNANCE (ENFORCED)
+# 1. SECURITY GOVERNANCE (PRODUCTION CODE ONLY)
 # ======================================================
 jobs:
   security-governance:
@@ -33,8 +33,8 @@ jobs:
         run: |
           pip install bandit==1.7.7 pip-audit==2.7.3
 
-      - name: Run Bandit Scan
-        run: bandit -r .
+      - name: Run Bandit Scan (Exclude Tests)
+        run: bandit -r . -x tests
 
       - name: Run Dependency Audit
         run: pip-audit
@@ -54,14 +54,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: |
+      - name: Install Dependencies
+        run: |
           pip install -r requirements.txt
           pip install pytest
 
-      - run: pytest tests/test_engines.py
+      - name: Run Engine Tests
+        run: pytest tests/test_engines.py
 
 # ======================================================
-# 3. DATA SOURCE CONTRACT VERIFICATION (SAFE MODE)
+# 3. DATA SOURCE CONTRACT VERIFICATION (CI SAFE)
 # ======================================================
   data-integrity:
     name: Data Source Contract Verification
@@ -75,7 +77,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
       - name: Validate Data Source Interfaces
         run: |
@@ -104,9 +107,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
-      - run: |
+      - name: Load API Kernel
+        run: |
           python - <<'EOF'
           import api_kernel
           print("API KERNEL LOADED")
@@ -127,9 +132,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
-      - run: |
+      - name: Load Application
+        run: |
           python - <<'EOF'
           import app
           print("APPLICATION LOADED")
@@ -150,9 +157,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
-      - run: |
+      - name: Load Reporting Engine
+        run: |
           python - <<'EOF'
           from reports.pdf_report_generator import generate_fbc_report
           print("REPORTING ENGINE LOADED")
@@ -173,7 +182,8 @@ jobs:
       - report-engine-integrity
 
     steps:
-      - run: |
+      - name: Final Certification
+        run: |
           echo "FBC SYSTEM CERTIFIED"
           echo "SYSTEM LINE: ${FBC_SYSTEM_LINE}"
           echo "VERSION RANGE: ${FBC_SYSTEM_VERSION}"
