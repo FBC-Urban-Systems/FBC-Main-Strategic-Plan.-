@@ -1,13 +1,13 @@
 # ==========================================
 # PATH: Projects/Project_III_Traffic_Intelligence/accident_pred.py
 # DESCRIPTION: Enterprise Traffic Risk Intelligence Engine
-# VERSION: v3.2.0
+# VERSION: v3.2.1
 # DATA MODE: REAL (CI-SAFE WITH HARD FALLBACK)
 # ==========================================
 
 from __future__ import annotations
 from typing import Dict, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import logging
 
 # --------------------------------------------------
@@ -32,7 +32,7 @@ except Exception:
 
 
 # --------------------------------------------------
-# DATA CONTRACT
+# DATA CONTRACT (INTERNAL)
 # --------------------------------------------------
 @dataclass(frozen=True)
 class TrafficRiskResult:
@@ -53,11 +53,11 @@ class TrafficRiskEngine:
 
     • Deterministic
     • Audit-safe
-    • Real-time capable
-    • Insurance & City-OS ready
+    • CI-backward compatible (dict output)
+    • Enterprise internal contract
     """
 
-    ENGINE_VERSION: str = "TRAFFIC-RISK-v3.2.0"
+    ENGINE_VERSION: str = "TRAFFIC-RISK-v3.2.1"
     DATA_MODE: str = "REAL"
     MAX_DENSITY_REFERENCE: float = 300.0
 
@@ -67,14 +67,21 @@ class TrafficRiskEngine:
         self.city: str = city.strip()
 
     # --------------------------------------------------
-    # CORE RISK ANALYSIS
+    # PUBLIC API (BACKWARD COMPATIBLE)
     # --------------------------------------------------
-    def analyze_real_time_risk(self, traffic_density: float) -> TrafficRiskResult:
+    def analyze_real_time_risk(self, traffic_density: float) -> Dict[str, Any]:
         """
-        Computes a normalized traffic risk score [0.0 – 1.0]
-        using real density + real weather intelligence.
+        Public contract:
+        - ALWAYS returns dict (legacy & CI safe)
         """
 
+        result = self._analyze_internal(traffic_density)
+        return asdict(result)
+
+    # --------------------------------------------------
+    # INTERNAL ENTERPRISE ENGINE
+    # --------------------------------------------------
+    def _analyze_internal(self, traffic_density: float) -> TrafficRiskResult:
         density = self._validate_density(traffic_density)
         weather = get_live_weather(self.city)
 
@@ -125,8 +132,8 @@ class TrafficRiskEngine:
 # CI / AUDIT SELF-TEST
 # --------------------------------------------------
 if __name__ == "__main__":
-    print("\n--- FBC TRAFFIC RISK ENGINE v3.2.0 SELF-TEST ---")
+    print("\n--- FBC TRAFFIC RISK ENGINE v3.2.1 SELF-TEST ---")
     engine = TrafficRiskEngine("AuditCity")
-    result = engine.analyze_real_time_risk(traffic_density=180)
+    result = engine.analyze_real_time_risk(180)
     print(result)
     print("--- ENGINE STATUS: OPERATIONAL ✅ ---\n")
