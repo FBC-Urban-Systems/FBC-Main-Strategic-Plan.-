@@ -1,119 +1,150 @@
-# 🏙️ FBC Digital Systems  
-## The Global Urban Operating System (City-OS)
-
-![System Status](https://img.shields.io/badge/System-ONLINE-success?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-SHA--256_Immutable-blue?style=for-the-badge)
-![Architecture](https://img.shields.io/badge/Architecture-City--OS_Core-purple?style=for-the-badge)
-![Scale](https://img.shields.io/badge/Target-Global_Scale-gold?style=for-the-badge)
+# FBC Digital Systems
+# Global Urban Operating System (City-OS)
+# VERSION: v1.0.0-MAX (ENTERPRISE / STRATEGIC)
+# CLASSIFICATION: CONFIDENTIAL • INTERNAL & PARTNER REVIEW
 
 ---
 
-## 🌍 Executive Overview
+## Executive Overview
 
-**FBC Digital Systems** develops a unified **City Operating System (City-OS)** — a modular AI, data, and security platform designed to help cities optimize revenue, infrastructure, safety, and data governance.
+FBC Digital Systems develops a unified AI-driven
+Urban Operating System (City-OS).
 
-The system integrates multiple urban intelligence engines into a single operational and financial control layer.
+City-OS is designed to enable cities to manage,
+optimize, and govern revenue, infrastructure,
+public safety, and urban data through
+a single, secure, and auditable platform.
 
-This repository contains **working simulation-grade implementations** of core City-OS components.
+This repository contains working,
+simulation-grade implementations
+of core City-OS components.
 
----
-
-## 🧠 Core Technology Pillars
-
-| Layer | Module | Description |
-|------|--------|------------|
-| **Project I** | Urban Revenue AI | Revenue optimization, yield modeling, and leakage control |
-| **Project II** | Private District OS | Energy intelligence and smart district optimization |
-| **Project III** | Traffic Intelligence | Real-time traffic risk and accident probability analysis |
-| **Project III-Ledger** | Secure Vault | Immutable SHA-256 audit and verification layer |
-| **Project IV** | City-OS Kernel | Unified API and execution gateway |
-| **Project V** | Digital Earth Exchange | Framework for ethical urban data monetization |
-| **Project VI** | Expansion Simulator | Long-term scaling and valuation modeling |
-
-Each module is independently testable and designed for future production hardening.
+It represents an engineering and strategic foundation,
+not a conceptual prototype.
 
 ---
 
-## 🚀 Strategic Roadmap (2027–2037)
+## Core System Architecture
 
-| Phase | Focus | Target Outcome | Current State |
-|------|-------|----------------|---------------|
-| **Phase I (2027–2029)** | Revenue AI & Pilot Cities | Foundational deployments | Active Development |
-| **Phase II (2030–2033)** | City-OS Expansion | Regional scaling | Simulation Validated |
-| **Phase III (2034–2037)** | Global City Network | Planet-scale City-OS | Strategic Design |
+City-OS is structured as a modular,
+multi-project operating system.
 
----
+Each project operates independently
+while integrating through a unified kernel.
 
-## 🛠️ Technical Stack
+| Project | Module | Function |
+|-------|--------|---------|
+| Project I | Urban Revenue AI | Municipal revenue optimization and leakage modeling |
+| Project II | Private District OS | Energy intelligence and infrastructure efficiency |
+| Project III-A | Traffic Intelligence | Traffic risk and accident probability analysis |
+| Project III-B | Secure Ledger | Immutable SHA-256 audit and integrity proofs |
+| Project IV | City-OS Kernel | Unified execution and API orchestration |
+| Project V | Digital Earth Exchange | Governed urban data monetization framework |
+| Project VI | Expansion Simulator | Long-term scaling and valuation modeling |
 
-- **Language:** Python 3.x  
-- **Data Processing:** Pandas, NumPy  
-- **APIs:** FastAPI  
-- **Visualization:** Streamlit  
-- **Security:** SHA-256 cryptographic audit layer  
-- **Storage:** SQLite / SQL-ready architecture  
-- **Architecture:** Modular multi-project City-OS kernel  
-
-All components are structured for CI, testing, and future cloud deployment.
-
----
-
-## 🛡️ Security & Data Integrity
-
-- Immutable SHA-256 audit ledger  
-- Deterministic proof generation  
-- Secure Data Exchange Protocol (SDEP)  
-- GDPR-aligned data handling architecture  
-
-**Security Posture:** Continuous verification enabled.
+All modules are designed for
+deterministic execution and future production hardening.
 
 ---
 
-## 📈 Financial & Scale Indicators (Model-Level)
+## Strategic Roadmap (2027–2037)
 
-- **Target Global Nodes:** 80+ cities  
-- **Projected ARR (Phase III):** $700M – $1.5B  
-- **Gross Margin Target:** 80%+  
-- **LTV / CAC Ratio:** 40x+  
+| Phase | Focus | Target Outcome | Status |
+|------|------|----------------|--------|
+| Phase I (2027–2029) | Revenue AI & Pilot Cities | Foundational deployments | Active Development |
+| Phase II (2030–2033) | City-OS Expansion | Regional scaling | Simulation Validated |
+| Phase III (2034–2037) | Global City Network | Planet-scale City-OS | Strategic Design |
 
-> Financial figures represent modeled projections used for simulation and strategic planning.
-
----
-
-## 🖥️ Live System Components
-
-- Global simulation engine  
-- Executive command dashboard  
-- PDF reporting framework  
-- Unified API kernel  
-- Secure financial ledger  
-
-All systems are designed as **functional prototypes**, not conceptual mockups.
+Roadmap reflects modeled execution paths
+based on infrastructure, governance,
+and adoption constraints.
 
 ---
 
-## ⚖️ Legal & IP Notice
+## Technical Stack
 
-All repository contents are proprietary to **FBC Digital Systems**.
+- Programming Language: Python 3.x
+- Data Processing: Pandas, NumPy
+- API Layer: FastAPI
+- Visualization & Control: Streamlit
+- Security: SHA-256 cryptographic audit ledger
+- Storage: SQLite (SQL-ready architecture)
+- Architecture: Modular City-OS kernel
 
-This repository is shared strictly for:
-- Authorized partner review  
-- Technical evaluation  
-- Strategic due diligence  
-
-See `LEGAL_NOTICE.md` for full terms.
+All components are CI-safe
+and structured for cloud deployment.
 
 ---
 
-## 📅 Repository Status
+## Security & Data Integrity Model
 
-- **Classification:** Confidential Strategic Technology  
-- **Audit Mode:** Continuous  
-- **Last Integrity Review:** 2026-01-29  
+- Immutable SHA-256 audit ledger
+- Deterministic proof generation
+- Secure Data Exchange Protocol (SDEP)
+- GDPR-aligned data governance design
+- End-to-end traceability for simulations and outputs
+
+Security posture is designed for
+continuous verification and audit readiness.
+
+---
+
+## Financial & Scale Indicators (Model-Level)
+
+The following metrics represent
+simulation-based strategic models:
+
+- Target Global Nodes: 80+ cities
+- Projected ARR (Phase III): USD 700M – 1.5B
+- Target Gross Margin: 80%+
+- LTV / CAC Ratio: 40x+
+
+Figures are non-binding
+and used exclusively for planning and simulation.
+
+---
+
+## Live System Components
+
+This repository includes functional systems:
+
+- Global multi-city simulation engine
+- Unified API kernel
+- Executive command dashboard
+- PDF and data export framework
+- Secure cryptographic ledger
+
+All systems are implemented as
+working prototypes, not mockups.
+
+---
+
+## Legal & Intellectual Property
+
+All contents of this repository
+are proprietary intellectual property
+of FBC Digital Systems.
+
+Access is granted solely for:
+- Authorized partner review
+- Technical evaluation
+- Strategic due diligence
+
+Refer to `LEGAL_NOTICE.md`
+for full legal terms and restrictions.
+
+---
+
+## Repository Status
+
+- Classification: Confidential Strategic Technology
+- Data Mode: REAL
+- Audit Mode: Continuous
+- Last Integrity Review: 2026-01-29
 
 ---
 
 © 2026 FBC Digital Systems  
-**All Rights Reserved**
+All rights reserved.
 
-*Engineering the Operating System of Urban Civilization.*
+Engineering the operating system of urban civilization.
