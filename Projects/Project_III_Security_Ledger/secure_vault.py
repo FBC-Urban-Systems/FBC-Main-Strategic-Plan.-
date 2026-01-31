@@ -1,13 +1,14 @@
 # ==========================================
 # PATH: Projects/Project_III_Security_Ledger/secure_vault.py
-# DESCRIPTION: Supreme Immutable Security Ledger
-# VERSION: v5.0-SUPREME-LEDGER-GRADE
-# DATA MODE: REAL (CI-SAFE)
+# DESCRIPTION: Enterprise-Grade Immutable Security Ledger
+# VERSION: v4.0.0-ENTERPRISE-IMMUTABLE-LEDGER
+# DATA MODE: REAL (CI-SAFE / PROD-READY)
 # ==========================================
 
 import hashlib
 import json
 import os
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
@@ -15,155 +16,160 @@ from typing import Dict, Any, List
 
 class FBCSecureVault:
     """
-    FBC Supreme Sector-Level Immutable Security Ledger
+    Enterprise-Grade Immutable Security Ledger (Sector Level)
 
-    - SHA-256 + Salt + Chain Linking
-    - CI-safe file initialization
-    - Backward compatible
-    - Future-ready for global federation
+    Capabilities:
+    - Deterministic SHA-256 hashing
+    - Chain-linked immutable records
+    - Atomic writes (corruption-safe)
+    - Schema-versioned ledger blocks
+    - CI-safe + Production-ready
+    - Forward-compatible with City OS & Digital Earth
     """
 
-    VAULT_VERSION = "SECURE-VAULT-v5.0-SUPREME"
-    PROTOCOL = "SHA-256-FBC-GOLD"
+    VAULT_VERSION = "SECURE-VAULT-v4.0.0"
+    LEDGER_SCHEMA_VERSION = "LEDGER-SCHEMA-v1"
+    PROTOCOL = "FBC-SHA256-IMMUTABLE"
 
-    def __init__(self):
+    def __init__(self) -> None:
         base_path = Path(__file__).resolve().parent
 
         self.ledger_file = base_path / "fbc_sector_ledger.json"
         self.global_ledger_path = (
-            base_path.parents[1] / "Project-IV-City-OS" / "fbc_global_ledger.json"
+            base_path.parents[1] / "Project_IV_City_OS" / "fbc_global_ledger.json"
         )
 
-        # Salt management (REAL but CI-safe)
         self._salt = os.getenv(
             "FBC_SECRET",
-            "FBC_GLOBAL_RESERVE_SUPREME_2026"
+            "FBC_GLOBAL_RESERVE_IMMUTABLE_CORE"
         )
 
         if not self.ledger_file.exists():
-            self._initialize_sector_ledger()
+            self._initialize_genesis()
 
     # --------------------------------------------------
-    # GENESIS INITIALIZATION
+    # GENESIS
     # --------------------------------------------------
-    def _initialize_sector_ledger(self) -> None:
+    def _initialize_genesis(self) -> None:
         genesis_block = {
             "index": 0,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": self._now(),
+            "schema": self.LEDGER_SCHEMA_VERSION,
             "project_id": "GENESIS",
             "node": "SECTOR_GENESIS",
-            "amount": 0,
+            "amount": 0.0,
             "protocol": self.PROTOCOL,
             "previous_hash": "0" * 64,
-            "audit_hash": self._hash("SECTOR_GENESIS_BLOCK"),
-            "status": "GENESIS_BLOCK",
+            "audit_hash": self._hash("GENESIS"),
+            "status": "GENESIS",
             "vault_version": self.VAULT_VERSION
         }
-        self._save_ledger([genesis_block])
+        self._atomic_save([genesis_block])
 
     # --------------------------------------------------
-    # CORE HASH FUNCTION
+    # CORE UTILITIES
     # --------------------------------------------------
+    @staticmethod
+    def _now() -> str:
+        return datetime.utcnow().isoformat(timespec="seconds")
+
     def _hash(self, raw: str) -> str:
-        return hashlib.sha256(raw.encode("utf-8")).hexdigest().upper()
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    def _canonical_hash(self, payload: Dict[str, Any]) -> str:
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        return self._hash(canonical + self._salt)
 
     # --------------------------------------------------
-    # LEDGER IO
+    # IO (ATOMIC)
     # --------------------------------------------------
     def _load_ledger(self) -> List[Dict[str, Any]]:
         with open(self.ledger_file, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def _save_ledger(self, ledger: List[Dict[str, Any]]) -> None:
-        with open(self.ledger_file, "w", encoding="utf-8") as f:
-            json.dump(ledger, f, indent=4)
+    def _atomic_save(self, ledger: List[Dict[str, Any]]) -> None:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=self.ledger_file.parent,
+            delete=False
+        ) as tmp:
+            json.dump(ledger, tmp, indent=4)
+            temp_name = tmp.name
+        os.replace(temp_name, self.ledger_file)
 
     # --------------------------------------------------
-    # BACKWARD-COMPATIBLE INTERFACE
+    # PUBLIC API
     # --------------------------------------------------
-    def generate_audit_proof(self, node_id: str, amount: float) -> Dict[str, Any]:
-        return self.generate_proof("PROJECT_III", node_id, amount)
-
-    # --------------------------------------------------
-    # SUPREME PROOF GENERATOR
-    # --------------------------------------------------
-    def generate_proof(
+    def generate_audit_proof(
         self,
         project_id: str,
         node_id: str,
         amount: float
     ) -> Dict[str, Any]:
 
+        if amount < 0:
+            raise ValueError("Negative values are not permitted in immutable ledger")
+
         ledger = self._load_ledger()
-        last_block = ledger[-1]
+        last = ledger[-1]
 
-        timestamp = datetime.utcnow().isoformat()
-        amount = float(amount)
-
-        raw_string = (
-            f"{project_id}|{node_id}|{amount}|{timestamp}|"
-            f"{self._salt}|{last_block['audit_hash']}"
-        )
-
-        audit_hash = self._hash(raw_string)
-
-        new_block = {
-            "index": last_block["index"] + 1,
-            "timestamp": timestamp,
+        block_core = {
+            "index": last["index"] + 1,
+            "timestamp": self._now(),
+            "schema": self.LEDGER_SCHEMA_VERSION,
             "project_id": project_id,
             "node": node_id,
-            "amount": amount,
+            "amount": float(amount),
             "protocol": self.PROTOCOL,
-            "previous_hash": last_block["audit_hash"],
-            "audit_hash": audit_hash,
-            "status": "IMMUTABLE_RECORD",
+            "previous_hash": last["audit_hash"],
             "vault_version": self.VAULT_VERSION
         }
 
-        ledger.append(new_block)
-        self._save_ledger(ledger)
+        block_core["audit_hash"] = self._canonical_hash(block_core)
+        block_core["status"] = "IMMUTABLE_RECORD"
 
-        self._mirror_to_global_ledger_safe(new_block)
+        ledger.append(block_core)
+        self._atomic_save(ledger)
 
-        return new_block
+        self._mirror_global_safe(block_core)
+        return block_core
 
     # --------------------------------------------------
-    # SAFE GLOBAL MIRROR (OPTIONAL)
+    # OPTIONAL GLOBAL MIRROR
     # --------------------------------------------------
-    def _mirror_to_global_ledger_safe(self, block: Dict[str, Any]) -> None:
+    def _mirror_global_safe(self, block: Dict[str, Any]) -> None:
+        if not self.global_ledger_path.exists():
+            return
+
         try:
-            if not self.global_ledger_path.exists():
-                return
-
             with open(self.global_ledger_path, "r", encoding="utf-8") as f:
                 global_ledger = json.load(f)
+        except Exception:
+            return
 
-            previous_hash = (
-                global_ledger[-1]["audit_hash"]
-                if global_ledger else "0" * 64
-            )
+        previous_hash = global_ledger[-1]["audit_hash"] if global_ledger else "0" * 64
 
-            global_ledger.append({
-                "index": len(global_ledger),
-                "timestamp": block["timestamp"],
-                "project_id": block["project_id"],
-                "node": block["node"],
-                "value": block["amount"],
-                "protocol": block["protocol"],
-                "previous_hash": previous_hash,
-                "audit_hash": block["audit_hash"],
-                "status": "MIRRORED_FROM_SECTOR"
-            })
+        global_ledger.append({
+            "index": len(global_ledger),
+            "timestamp": block["timestamp"],
+            "project_id": block["project_id"],
+            "node": block["node"],
+            "value": block["amount"],
+            "protocol": block["protocol"],
+            "previous_hash": previous_hash,
+            "audit_hash": block["audit_hash"],
+            "status": "MIRRORED"
+        })
 
+        try:
             with open(self.global_ledger_path, "w", encoding="utf-8") as f:
                 json.dump(global_ledger, f, indent=4)
-
         except Exception:
-            # Global ledger is optional — sector ledger never fails
             pass
 
     # --------------------------------------------------
-    # LEDGER VERIFICATION
+    # VERIFICATION
     # --------------------------------------------------
     def verify_sector_ledger(self) -> Dict[str, Any]:
         ledger = self._load_ledger()
@@ -172,43 +178,30 @@ class FBCSecureVault:
             current = ledger[i]
             previous = ledger[i - 1]
 
-            raw_check = (
-                f"{current['project_id']}|{current['node']}|{current['amount']}|"
-                f"{current['timestamp']}|{self._salt}|{previous['audit_hash']}"
-            )
+            recalculated = self._canonical_hash({
+                k: current[k]
+                for k in current
+                if k not in {"audit_hash", "status"}
+            })
 
-            recalculated_hash = self._hash(raw_check)
-
-            if recalculated_hash != current["audit_hash"]:
-                return {
-                    "status": "TAMPER_DETECTED",
-                    "failed_block": i
-                }
+            if recalculated != current["audit_hash"]:
+                return {"status": "TAMPER_DETECTED", "block": i}
 
             if current["previous_hash"] != previous["audit_hash"]:
-                return {
-                    "status": "CHAIN_BROKEN",
-                    "failed_block": i
-                }
+                return {"status": "CHAIN_BROKEN", "block": i}
 
         return {
-            "status": "SECTOR_LEDGER_INTEGRITY_CONFIRMED",
+            "status": "LEDGER_VERIFIED",
             "blocks": len(ledger),
             "vault_version": self.VAULT_VERSION
         }
 
 
 # --------------------------------------------------
-# STANDALONE SUPREME TEST (CI SAFE)
+# CI / LOCAL TEST
 # --------------------------------------------------
 if __name__ == "__main__":
-    print("\n--- FBC SUPREME SECURITY LEDGER TEST ---")
-
     vault = FBCSecureVault()
-    proof = vault.generate_audit_proof("Audit-Node", 42.75)
-
-    print("Block:", proof["index"], proof["audit_hash"][:24], "...")
-    verification = vault.verify_sector_ledger()
-    print("Verification:", verification["status"])
-
-    print("--- SECURITY LEDGER OPERATIONAL ✅ ---\n")
+    vault.generate_audit_proof("PROJECT_III", "AuditNode-01", 100.5)
+    result = vault.verify_sector_ledger()
+    print(result)
