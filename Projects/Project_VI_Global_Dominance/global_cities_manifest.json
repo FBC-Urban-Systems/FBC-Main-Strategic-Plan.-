@@ -51,7 +51,7 @@
   "global_expansion_strategy": {
     "phase_1_2027_2029": {
       "objective": "North America and Private District Market Entry",
-      "cities": [
+      "target_cities": [
         {
           "city": "Austin",
           "region": "North America",
@@ -69,7 +69,7 @@
 
     "phase_2_2030_2031": {
       "objective": "MENA and ASEAN Strategic Hubs",
-      "cities": [
+      "target_cities": [
         {
           "city": "Dubai",
           "region": "MENA",
@@ -93,7 +93,7 @@
 
     "phase_3_2032_2034": {
       "objective": "Europe and Japan Scaling Anchors",
-      "cities": [
+      "target_cities": [
         {
           "city": "Berlin",
           "region": "Europe",
@@ -107,13 +107,6 @@
           "expected_arr_usd_m": 11.0
         }
       ]
-    },
-
-    "phase_4_2035_2037": {
-      "objective": "Planetary Digital Earth Network",
-      "target_cities_total": 80,
-      "expected_total_arr_usd_m": 300.0,
-      "data_volume_target_petabytes": 2.0
     }
   },
 
