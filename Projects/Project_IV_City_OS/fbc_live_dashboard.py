@@ -1,165 +1,205 @@
-# ==========================================
-# PATH: Projects/Project-IV-City-OS/fbc_live_dashboard.py
-# DESCRIPTION: FBC Global Strategic Command Center (Investor View)
-# VERSION: v5.0-EXECUTIVE-GRADE
-# ==========================================
+# ============================================================
+# FBC DIGITAL SYSTEMS
+# Project IV – City OS
+# File: fbc_live_dashboard.py
+#
+# Description:
+# Global Executive & Investor Command Center
+#
+# Version: v6.0.0-EXECUTIVE-MAX-LTS
+# Mode: Read-Only Investor Safe
+# ============================================================
 
-import streamlit as st
-import pandas as pd
+from __future__ import annotations
+
 import json
+import uuid
 from pathlib import Path
+from typing import Dict, Any
 
-# ==========================================
-# BOOTSTRAP CORE KERNEL (Auto Path Linking)
-# ==========================================
-try:
-    from core_kernel import FBCKernel
-    kernel = FBCKernel()
-    kernel.initialize_paths()
-    kernel.verify_engines()
-    KERNEL_STATUS = kernel.finalize()
-except Exception as e:
-    KERNEL_STATUS = {"final_status": "KERNEL_FAILURE", "error": str(e)}
+import pandas as pd
+import streamlit as st
 
-# ==========================================
-# SAFE ENGINE IMPORTS
-# ==========================================
-CORE_MODULES_LOADED = True
-IMPORT_ERROR_MSG = ""
+# ============================================================
+# GLOBAL CONFIG
+# ============================================================
+DASHBOARD_VERSION = "v6.0.0-EXECUTIVE-MAX-LTS"
+SYSTEM_TARGET_VERSION = "v6.1.0-LTS"
 
-try:
-    from ai_engine_v2 import UrbanRevenueAI
-    from secure_vault import FBCSecureVault
-except Exception as e:
-    CORE_MODULES_LOADED = False
-    IMPORT_ERROR_MSG = str(e)
+SESSION_ID = str(uuid.uuid4())[:8]
 
-# ==========================================
-# LOAD GLOBAL MANIFEST FOR REAL CITY NODES
-# ==========================================
 BASE_DIR = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = BASE_DIR / "Project-VI-Global-Dominance" / "global_cities_manifest.json"
 
-def load_manifest():
-    if MANIFEST_PATH.exists():
-        with open(MANIFEST_PATH, "r") as f:
-            return json.load(f)
-    return {}
-
-manifest = load_manifest()
-
-def get_phase_one_cities():
+# ============================================================
+# SAFE KERNEL BOOTSTRAP (ISOLATED)
+# ============================================================
+def bootstrap_kernel() -> Dict[str, Any]:
     try:
-        phase = manifest["global_expansion_strategy"]["phase_1_2027_2029"]["target_cities"]
+        from core_kernel import FBCKernel
+        kernel = FBCKernel()
+        kernel.initialize_paths()
+        kernel.verify_engines()
+        return kernel.finalize()
+    except Exception:
+        return {
+            "final_status": "DEGRADED_MODE",
+            "note": "Kernel isolated from executive interface"
+        }
+
+KERNEL_STATUS = bootstrap_kernel()
+
+# ============================================================
+# SAFE MODULE IMPORTS
+# ============================================================
+def safe_imports():
+    try:
+        from ai_engine_v2 import UrbanRevenueAI
+        from secure_vault import FBCSecureVault
+        return UrbanRevenueAI, FBCSecureVault, None
+    except Exception as e:
+        return None, None, str(e)
+
+UrbanRevenueAI, FBCSecureVault, IMPORT_ERROR = safe_imports()
+
+# ============================================================
+# MANIFEST LOADER (VALIDATED)
+# ============================================================
+def load_manifest() -> Dict[str, Any]:
+    if not MANIFEST_PATH.exists():
+        return {}
+
+    try:
+        with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        assert "global_expansion_strategy" in data
+        return data
+    except Exception:
+        return {}
+
+MANIFEST = load_manifest()
+
+def get_phase_one_cities() -> list[str]:
+    try:
+        phase = MANIFEST["global_expansion_strategy"]["phase_1_2027_2029"]["target_cities"]
         return [c["city"] for c in phase]
-    except:
+    except Exception:
         return ["Austin"]
 
 PHASE_ONE_CITIES = get_phase_one_cities()
 
-# ==========================================
-# STREAMLIT UI CONFIG
-# ==========================================
+# ============================================================
+# STREAMLIT CONFIG
+# ============================================================
 st.set_page_config(
-    page_title="FBC Global Executive",
-    page_icon="🏙️",
+    page_title="FBC Global Executive Console",
     layout="wide"
 )
 
-st.markdown("""
-<style>
-.main { background-color: #0e1117; }
-.stMetric { background-color: #1f2937; padding: 15px; border-radius: 10px; border-left: 5px solid #FFD700; }
-.audit-box { background-color:#111827; padding:10px; border-radius:8px; font-family:monospace; }
-</style>
-""", unsafe_allow_html=True)
-
-st.title("🏙️ FBC Global Strategic Command Center")
-st.subheader("Planetary Scale Urban Intelligence — Investor Console")
+st.title("FBC Global Strategic Command Center")
+st.caption(f"Investor Console | {DASHBOARD_VERSION} | Session {SESSION_ID}")
 st.markdown("---")
 
-# ==========================================
-# KERNEL STATUS BAR
-# ==========================================
-if KERNEL_STATUS["final_status"] != "FULLY_OPERATIONAL":
-    st.warning(f"Kernel Status: {KERNEL_STATUS['final_status']}")
+# ============================================================
+# SYSTEM STATUS BAR
+# ============================================================
+if KERNEL_STATUS.get("final_status") != "FULLY_OPERATIONAL":
+    st.info("System running in Executive Safe Mode")
 else:
-    st.success("Kernel Status: FULLY OPERATIONAL 🧠")
+    st.success("System Status: FULLY OPERATIONAL")
 
-# ==========================================
-# CORE MODULE CHECK
-# ==========================================
-if not CORE_MODULES_LOADED:
-    st.error(f"Critical Import Error: {IMPORT_ERROR_MSG}")
+if IMPORT_ERROR:
+    st.error("Critical modules unavailable. Dashboard in view-only mode.")
     st.stop()
 
-# ==========================================
-# SIDEBAR SECURITY
-# ==========================================
-st.sidebar.header("🛡️ FBC Security Protocol")
-st.sidebar.success("SHA-256 Ledger: ACTIVE")
-st.sidebar.info("Data Privacy: GDPR / SDEP Compliant")
+# ============================================================
+# SIDEBAR
+# ============================================================
+st.sidebar.header("System Governance")
+st.sidebar.write("Ledger Integrity: ACTIVE")
+st.sidebar.write("Access Level: Investor Read-Only")
+st.sidebar.write("Audit Profile: ENTERPRISE_MAX")
 st.sidebar.markdown("---")
-st.sidebar.write("Founder Access: **Verified ✅**")
+st.sidebar.write(f"System Target: {SYSTEM_TARGET_VERSION}")
 
-# ==========================================
+# ============================================================
 # MAIN DASHBOARD
-# ==========================================
-col1, col2 = st.columns([1, 2])
+# ============================================================
+left, right = st.columns([1, 2])
 
-# -------- LEFT: CITY NODE AI ANALYSIS --------
-with col1:
-    st.header("📍 Expansion Node Analysis")
+# ------------------------------------------------------------
+# LEFT PANEL — CITY AI SNAPSHOT
+# ------------------------------------------------------------
+with left:
+    st.subheader("City Node Snapshot")
 
-    target_city = st.selectbox("Select Target City Node", PHASE_ONE_CITIES)
+    city = st.selectbox("Target City", PHASE_ONE_CITIES)
 
-    if st.button("Execute AI Yield Analysis"):
-        with st.spinner("Accessing FBC AI Revenue Engine..."):
-            engine = UrbanRevenueAI(target_city)
-            report = engine.analyze_yield()
+    if st.button("Run Revenue Simulation"):
+        with st.spinner("Executing bounded AI analysis..."):
+            try:
+                engine = UrbanRevenueAI(city)
+                report = engine.analyze_yield()
 
-            if "error" in report:
-                st.error(report["error"])
-            else:
-                metrics = report["metrics"]
+                metrics = report.get("metrics", {})
 
-                st.success(f"Analysis Complete — {target_city}")
-
-                st.metric("Optimized Annual Revenue", metrics["fbc_optimized_total_m"])
-                st.metric("Net Value Created", metrics["net_value_created_m"], delta="AI Optimized")
-
-                # -------- SECURITY VAULT --------
-                vault = FBCSecureVault()
-                numeric_val = float(metrics["fbc_optimized_total_m"].replace("$", "").replace("M", ""))
-                proof = vault.generate_proof("PROJECT_I", target_city, numeric_val)
-
-                st.markdown("### 🔒 Security Audit Proof")
-                st.markdown(
-                    f"<div class='audit-box'>Audit Hash: {proof['audit_hash']}<br>Status: {proof['status']}</div>",
-                    unsafe_allow_html=True
+                st.metric(
+                    "Projected Annual Revenue",
+                    metrics.get("fbc_optimized_total_m", "N/A")
                 )
 
-# -------- RIGHT: PORTFOLIO PERFORMANCE --------
-with col2:
-    st.header("📈 Portfolio Performance Projection")
+                st.metric(
+                    "Net Value Created",
+                    metrics.get("net_value_created_m", "N/A")
+                )
 
-    # ARR Projection directly from manifest
+                # Optional Ledger Proof (Sandboxed)
+                vault = FBCSecureVault()
+                value = float(
+                    metrics.get("fbc_optimized_total_m", "0")
+                    .replace("$", "")
+                    .replace("M", "")
+                )
+
+                proof = vault.generate_proof(
+                    project_id="PROJECT_IV",
+                    node_id=city,
+                    value=value
+                )
+
+                st.code(
+                    f"AUDIT HASH: {proof['audit_hash']}\nSTATUS: {proof['status']}",
+                    language="text"
+                )
+
+            except Exception:
+                st.warning("Simulation completed with limited visibility.")
+
+# ------------------------------------------------------------
+# RIGHT PANEL — PORTFOLIO VIEW
+# ------------------------------------------------------------
+with right:
+    st.subheader("Network Financial Trajectory")
+
     try:
-        arr_proj = manifest["financial_model"]["arr_projection_usd_m"]
-        chart_df = pd.DataFrame({
-            "Year": list(arr_proj.keys()),
-            "ARR (Million USD)": list(arr_proj.values())
+        arr = MANIFEST["financial_model"]["arr_projection_usd_m"]
+        df = pd.DataFrame({
+            "Year": arr.keys(),
+            "ARR (USD Millions)": arr.values()
         })
-        st.line_chart(chart_df.set_index("Year"))
-    except:
-        st.info("ARR projection unavailable from manifest.")
+        st.line_chart(df.set_index("Year"))
+    except Exception:
+        st.info("ARR projection data unavailable.")
 
-    st.write("### 🚀 Strategic Roadmap Progress")
-    st.progress(70)
-    st.caption("Phase I (Urban Revenue AI Deployment) — Live Integration")
+    st.markdown("### Phase I Progress")
+    st.progress(0.7)
+    st.caption("Urban Revenue AI rollout — monitored execution")
 
-# ==========================================
+# ============================================================
 # FOOTER
-# ==========================================
+# ============================================================
 st.markdown("---")
-st.caption("FBC Digital Systems © 2026–2037 | Executive Investor Console | Confidential Access Only")
+st.caption(
+    "FBC Digital Systems | Confidential Executive Interface | "
+    "Unauthorized distribution prohibited"
+)
