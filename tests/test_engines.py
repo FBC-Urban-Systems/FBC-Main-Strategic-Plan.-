@@ -1,8 +1,8 @@
 # =========================================================
 # PATH: /tests/test_engines.py
-# DESCRIPTION: Supreme Integrity Tests for Core AI Engines
-# VERSION: v3.0.0 — REAL DATA SAFE • FUTURE PROOF
-# ROLE: Contract & Stability Validation Layer
+# DESCRIPTION: Core Engine Contract & Stability Tests
+# VERSION: v4.0.0 — CONTRACT SAFE • CI READY
+# ROLE: System Trust & Regression Validation Layer
 # =========================================================
 
 import pytest
@@ -24,7 +24,7 @@ def test_revenue_engine_contract():
 
     result = engine.project_incremental_gain(1_000_000)
 
-    assert isinstance(result, dict), "Revenue engine must return dict"
+    assert isinstance(result, dict)
     assert "Total_City_Gain" in result
     assert isinstance(result["Total_City_Gain"], (int, float))
     assert result["Total_City_Gain"] >= 0
@@ -36,7 +36,7 @@ def test_revenue_engine_contract():
 def test_energy_engine_contract():
     result = predict_energy_savings(100_000)
 
-    assert isinstance(result, dict), "Energy engine must return dict"
+    assert isinstance(result, dict)
     assert "ai_predicted_savings" in result
     assert isinstance(result["ai_predicted_savings"], (int, float))
     assert result["ai_predicted_savings"] >= 0
@@ -50,7 +50,7 @@ def test_traffic_engine_contract():
 
     result = engine.analyze_real_time_risk(120)
 
-    assert isinstance(result, dict), "Traffic engine must return dict"
+    assert isinstance(result, dict)
     assert "risk_score" in result
     assert isinstance(result["risk_score"], (int, float))
 
@@ -65,10 +65,14 @@ def test_secure_vault_contract():
 
     assert isinstance(proof, dict)
     assert "audit_hash" in proof
-    assert "status" in proof
-
     assert isinstance(proof["audit_hash"], str)
-    assert proof["status"] in ["SIGNED", "VERIFIED", "SECURED"]
+
+    assert "status" in proof
+    assert proof["status"] in {
+        "SIGNED",
+        "VERIFIED",
+        "SECURED"
+    }
 
 
 # =========================================================
@@ -76,9 +80,10 @@ def test_secure_vault_contract():
 # =========================================================
 def test_system_smoke():
     """
-    Ensures all engines can initialize and execute
+    Validates that all core engines initialize and execute
     without raising runtime exceptions.
     """
+
     RevenueOptimizer("SmokeCity")
     TrafficRiskEngine("SmokeCity")
     FBCSecureVault()
