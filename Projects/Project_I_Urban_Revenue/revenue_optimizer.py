@@ -1,10 +1,9 @@
 # ==========================================
 # PATH: Projects/Project_I_Urban_Revenue/revenue_optimizer.py
 # DESCRIPTION: FBC Urban Revenue Optimization Orchestrator
-# VERSION: v6.0.0-ENTERPRISE-MAX-LTS
+# VERSION: v6.1.0-ENTERPRISE-MAX-LTS
 # CLASSIFICATION: PRODUCTION / AUDIT / CI-CRITICAL
-# ROLE: ORCHESTRATION + CONTRACT STABILITY LAYER
-# DATA MODE: SIMULATION / DETERMINISTIC WHEN PROVIDED
+# ROLE: CONTRACT ORCHESTRATION LAYER
 # ==========================================
 
 from datetime import datetime
@@ -13,7 +12,7 @@ from typing import Dict, Optional
 from .revenue_sim import calculate_revenue_boost
 
 
-ENGINE_VERSION = "REVENUE-OPTIMIZER-v6.0.0-ENTERPRISE-MAX"
+ENGINE_VERSION = "REVENUE-OPTIMIZER-v6.1.0-ENTERPRISE-MAX"
 ENGINE_ROLE = "URBAN_REVENUE_CONTRACT_ORCHESTRATOR"
 DATA_MODE = "SIMULATION"
 
@@ -22,10 +21,10 @@ class RevenueOptimizer:
     """
     Enterprise-grade Revenue Optimization Orchestrator.
 
-    This layer:
-    - Preserves contract stability across engine versions
-    - Normalizes financial schemas for City-OS & CI
-    - Delegates all math to revenue_sim without mutation
+    Guarantees:
+    - Full backward compatibility with legacy engines
+    - Stable CI / audit contract
+    - Zero mutation of core financial logic
     """
 
     def __init__(self, city_name: str):
@@ -36,7 +35,7 @@ class RevenueOptimizer:
         self.engine_version = ENGINE_VERSION
 
     # --------------------------------------------------
-    # PUBLIC ENTERPRISE CONTRACT
+    # PUBLIC CONTRACT (CI + LEGACY SAFE)
     # --------------------------------------------------
     def project_incremental_gain(
         self,
@@ -46,10 +45,10 @@ class RevenueOptimizer:
         """
         Projects incremental revenue gain for a city.
 
-        Guarantees:
-        - Zero mutation of core revenue logic
-        - Backward + forward compatible schema
-        - CI-safe deterministic output
+        Contract Rules:
+        - Must expose legacy keys
+        - Must expose modern keys
+        - Deterministic if efficiency provided
         """
 
         result = calculate_revenue_boost(
@@ -57,11 +56,12 @@ class RevenueOptimizer:
             efficiency_gain=efficiency_gain
         )
 
-        # ---- BASELINE NORMALIZATION (CRITICAL) ----
-        baseline_revenue = result.get(
+        baseline = result.get(
             "original_revenue",
-            result.get("baseline_revenue", float(base_revenue))
+            float(base_revenue)
         )
+
+        total_gain = result["total_optimized_revenue"]
 
         return {
             # --------------------------------------------------
@@ -70,12 +70,19 @@ class RevenueOptimizer:
             "city": self.city_name,
 
             # --------------------------------------------------
-            # CORE FINANCIAL METRICS (CONTRACT-STABLE)
+            # LEGACY CONTRACT (DO NOT BREAK)
             # --------------------------------------------------
-            "original_revenue": baseline_revenue,
-            "baseline_revenue": baseline_revenue,
+            "Base_Revenue": baseline,
+            "Incremental_Gain": result["ai_generated_boost"],
+            "Total_City_Gain": total_gain,
+
+            # --------------------------------------------------
+            # MODERN CONTRACT (EXTENDED)
+            # --------------------------------------------------
+            "original_revenue": baseline,
+            "baseline_revenue": baseline,
             "ai_generated_boost": result["ai_generated_boost"],
-            "total_optimized_revenue": result["total_optimized_revenue"],
+            "total_optimized_revenue": total_gain,
             "efficiency_gain_percent": result["efficiency_gain_percent"],
 
             # --------------------------------------------------
@@ -84,7 +91,7 @@ class RevenueOptimizer:
             "status": result["status"],
 
             # --------------------------------------------------
-            # GOVERNANCE & AUDIT
+            # GOVERNANCE
             # --------------------------------------------------
             "engine_version": self.engine_version,
             "engine_role": ENGINE_ROLE,
@@ -92,7 +99,7 @@ class RevenueOptimizer:
             "timestamp_utc": datetime.utcnow().isoformat(),
 
             # --------------------------------------------------
-            # FORMATTED OUTPUT (DASHBOARD SAFE)
+            # FORMATTED (DASHBOARD SAFE)
             # --------------------------------------------------
             "formatted": result["formatted"]
         }
@@ -104,13 +111,10 @@ class RevenueOptimizer:
 if __name__ == "__main__":
     print("\n--- FBC REVENUE OPTIMIZER ENTERPRISE MAX TEST ---")
 
-    optimizer = RevenueOptimizer("Enterprise-Test-City")
-    report = optimizer.project_incremental_gain(
-        base_revenue=1_000_000,
-        efficiency_gain=0.20
-    )
+    optimizer = RevenueOptimizer("CI-Test-City")
+    report = optimizer.project_incremental_gain(1_000_000, 0.20)
 
-    for key, value in report.items():
-        print(f"{key}: {value}")
+    for k, v in report.items():
+        print(f"{k}: {v}")
 
     print("--- REVENUE OPTIMIZER ENTERPRISE MAX OPERATIONAL ---\n")
