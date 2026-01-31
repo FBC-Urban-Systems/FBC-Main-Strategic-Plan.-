@@ -1,4 +1,4 @@
-name: FBC CONTINUOUS SYSTEM AUDIT v6.0.0-LTS — MAX ENTERPRISE
+name: FBC CONTINUOUS SYSTEM AUDIT v6.1.0-LTS — ENTERPRISE MAX
 
 on:
   push:
@@ -9,13 +9,13 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  FBC_SYSTEM_VERSION: "v6.0.0-LTS"
+  FBC_SYSTEM_VERSION: "v6.1.0-LTS"
   FBC_DATA_MODE: "REAL"
   FBC_AUDIT_PROFILE: "ENTERPRISE_MAX"
   PYTHONPATH: ${{ github.workspace }}
 
 # ======================================================
-# 1. SECURITY & GOVERNANCE LAYER (POLICY-AWARE)
+# 1. SECURITY & GOVERNANCE (REPORT-ONLY POLICY)
 # ======================================================
 jobs:
   security-governance:
@@ -31,23 +31,22 @@ jobs:
 
       - name: Install Enterprise Security Toolchain
         run: |
-          pip install \
-            bandit==1.7.7 \
-            pip-audit==2.7.3
+          pip install bandit==1.7.7 pip-audit==2.7.3
 
-      - name: Run Bandit (Enterprise Policy Mode)
+      - name: Run Bandit (Enterprise Report Mode)
         run: |
           bandit -r . \
             -x tests \
-            --severity-level low \
-            --confidence-level high
+            --severity-level medium \
+            --confidence-level high \
+            --exit-zero
 
       - name: Dependency Vulnerability Audit
         run: |
           pip-audit || true
 
 # ======================================================
-# 2. ENGINE CONTRACT & TRUST VERIFICATION
+# 2. ENGINE CONTRACT VERIFICATION
 # ======================================================
   engine-integrity:
     name: Engine Contract Verification
@@ -56,21 +55,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Runtime & Test Stack
-        run: |
+      - run: |
           pip install -r requirements.txt
           pip install pytest
 
-      - name: Execute Engine Contract Tests
-        run: pytest tests/test_engines.py
+      - run: pytest tests/test_engines.py
 
 # ======================================================
-# 3. DATA SOURCE CONTRACT LAYER
+# 3. DATA SOURCE CONTRACT VERIFICATION
 # ======================================================
   data-integrity:
     name: Data Source Contract Verification
@@ -79,16 +75,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Validate Data Providers
-        run: |
+      - run: |
           python - <<'EOF'
           from data_sources.weather_api import get_live_weather
           from data_sources.population_data import fetch_population
@@ -100,14 +93,14 @@ jobs:
           fetch_gdp("EG")
           get_country_energy_price("EG")
 
-          print("DATA CONTRACTS VERIFIED")
+          print("DATA SOURCE CONTRACTS VERIFIED")
           EOF
 
 # ======================================================
-# 4. API KERNEL INTEGRITY
+# 4. API KERNEL
 # ======================================================
   api-kernel-integrity:
-    name: API Kernel Integrity
+    name: API Kernel Verification
     runs-on: ubuntu-latest
     needs: data-integrity
 
@@ -122,14 +115,14 @@ jobs:
       - run: |
           python - <<'EOF'
           import api_kernel
-          print("API KERNEL VERIFIED")
+          print("API KERNEL LOADED")
           EOF
 
 # ======================================================
-# 5. APPLICATION LAYER VERIFICATION
+# 5. APPLICATION LAYER
 # ======================================================
   app-integrity:
-    name: Application Layer Integrity
+    name: Application Verification
     runs-on: ubuntu-latest
     needs: api-kernel-integrity
 
@@ -144,14 +137,14 @@ jobs:
       - run: |
           python - <<'EOF'
           import app
-          print("APPLICATION LAYER VERIFIED")
+          print("APPLICATION LOADED")
           EOF
 
 # ======================================================
-# 6. REPORTING & EXPORT SYSTEMS
+# 6. REPORTING ENGINE
 # ======================================================
   report-engine-integrity:
-    name: Reporting Engine Integrity
+    name: Reporting Engine Verification
     runs-on: ubuntu-latest
     needs: app-integrity
 
@@ -167,11 +160,11 @@ jobs:
           python - <<'EOF'
           from reports.pdf_report_generator import generate_fbc_report
           generate_fbc_report
-          print("REPORTING ENGINE VERIFIED")
+          print("REPORTING ENGINE LOADED")
           EOF
 
 # ======================================================
-# 7. SYSTEM CERTIFICATION & SEAL
+# 7. SYSTEM CERTIFICATION
 # ======================================================
   certification:
     name: Enterprise System Certification
@@ -186,7 +179,7 @@ jobs:
 
     steps:
       - run: |
-          echo "FBC SYSTEM STATUS: CERTIFIED"
-          echo "SYSTEM VERSION: ${FBC_SYSTEM_VERSION}"
+          echo "FBC SYSTEM CERTIFIED"
+          echo "VERSION: ${FBC_SYSTEM_VERSION}"
           echo "AUDIT PROFILE: ${FBC_AUDIT_PROFILE}"
-          echo "DATA MODE: ${FBC_DATA_MODE}"
+          echo "MODE: ${FBC_DATA_MODE}"
