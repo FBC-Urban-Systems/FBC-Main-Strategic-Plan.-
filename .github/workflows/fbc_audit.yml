@@ -1,4 +1,4 @@
-name: FBC SUPREME CONTINUOUS SYSTEM AUDIT v7.0 — ENTERPRISE VERIFIED
+name: FBC SUPREME CONTINUOUS SYSTEM AUDIT v8.0 — ENTERPRISE CERTIFIED
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  FBC_SYSTEM_VERSION: "SUPREME-v7.0"
+  FBC_SYSTEM_VERSION: "SUPREME-v8.0"
   FBC_DATA_MODE: "REAL"
   PYTHONPATH: ${{ github.workspace }}
 
@@ -23,11 +23,9 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -35,23 +33,21 @@ jobs:
       - name: Install Security Toolchain
         run: |
           python -m pip install --upgrade pip
-          pip install bandit pip-audit
+          pip install bandit==1.7.7 pip-audit==2.7.3
 
-      - name: Static Security Scan (Critical / High Only)
+      - name: Static Security Scan (Fail on High/Critical)
         run: |
-          bandit -r . \
-            --severity-level high \
-            --confidence-level high || true
+          bandit -r . --severity-level high --confidence-level high
 
       - name: Dependency Vulnerability Audit
         run: |
-          pip-audit --progress-spinner off || true
+          pip-audit --progress-spinner off
 
 # ======================================================
-# 2. CORE ENGINE VERIFICATION
+# 2. CORE ENGINE & CONTRACT TESTING
 # ======================================================
   engine-integrity:
-    name: 🧠 Core Engine Verification
+    name: 🧠 Core Engine & Contract Verification
     runs-on: ubuntu-latest
     needs: security-governance
 
@@ -62,30 +58,19 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Runtime Dependencies
-        run: pip install -r requirements.txt
-
-      - name: Verify AI Engine Contracts
+      - name: Install Dependencies
         run: |
-          python - <<'EOF'
-          from Projects.Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
-          from Projects.Project_II_Private_Districts.energy_forecast import predict_energy_savings
-          from Projects.Project_III_Traffic_Intelligence.accident_pred import TrafficRiskEngine
-          from Projects.Project_III_Security_Ledger.secure_vault import FBCSecureVault
+          pip install -r requirements.txt
+          pip install pytest
 
-          RevenueOptimizer("AuditCity")
-          predict_energy_savings(1000)
-          TrafficRiskEngine("AuditCity")
-          FBCSecureVault()
-
-          print("CORE ENGINE CONTRACTS VERIFIED")
-          EOF
+      - name: Run Engine Contract Tests
+        run: pytest tests/test_engines.py
 
 # ======================================================
-# 3. DATA CORE VERIFICATION
+# 3. DATA SOURCE & DATA CORE VERIFICATION
 # ======================================================
-  data-core-integrity:
-    name: 🗄️ Data Core Verification
+  data-integrity:
+    name: 🗄️ Data Sources & Core Verification
     runs-on: ubuntu-latest
     needs: engine-integrity
 
@@ -96,16 +81,23 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Runtime Dependencies
+      - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify Data Core Interfaces
+      - name: Validate Data Source Contracts
         run: |
           python - <<'EOF'
-          from data_core import fetch_all_results, store_simulation_result
-          assert callable(fetch_all_results)
-          assert callable(store_simulation_result)
-          print("DATA CORE INTERFACES VERIFIED")
+          from data_sources.weather_api import get_live_weather
+          from data_sources.population_data import fetch_population
+          from data_sources.gdp_data import fetch_gdp
+          from data_sources.energy_price_data import get_country_energy_price
+
+          assert isinstance(get_live_weather("Cairo"), dict)
+          assert isinstance(fetch_population("EG"), int)
+          assert isinstance(fetch_gdp("EG"), float)
+          assert isinstance(get_country_energy_price("EG"), dict)
+
+          print("DATA SOURCE CONTRACTS VERIFIED")
           EOF
 
 # ======================================================
@@ -114,7 +106,7 @@ jobs:
   api-kernel-integrity:
     name: 🌐 API Kernel Verification
     runs-on: ubuntu-latest
-    needs: data-core-integrity
+    needs: data-integrity
 
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +115,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Runtime Dependencies
+      - name: Install Dependencies
         run: pip install -r requirements.txt
 
       - name: Verify API Kernel Import
@@ -148,14 +140,14 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Runtime Dependencies
+      - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify Application Entry Point
+      - name: Verify Application Entry
         run: |
           python - <<'EOF'
           import app
-          print("APPLICATION LAYER VERIFIED")
+          print("APPLICATION VERIFIED")
           EOF
 
 # ======================================================
@@ -173,10 +165,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Runtime Dependencies
+      - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Verify Reporting Engine
+      - name: Verify PDF Reporting Engine
         run: |
           python - <<'EOF'
           from reports.pdf_report_generator import generate_fbc_report
@@ -185,35 +177,35 @@ jobs:
           EOF
 
 # ======================================================
-# 7. SYSTEM CERTIFICATION & ATTESTATION
+# 7. EXECUTIVE CERTIFICATION & ARTIFACT ATTESTATION
 # ======================================================
   executive-certification:
-    name: 🏆 System Certification & Attestation
+    name: 🏆 Executive System Certification
     runs-on: ubuntu-latest
     needs:
       - security-governance
       - engine-integrity
-      - data-core-integrity
+      - data-integrity
       - api-kernel-integrity
       - app-integrity
       - report-engine-integrity
 
     steps:
-      - name: Generate System Certificate
+      - name: Generate Enterprise Certificate
         run: |
           {
             echo "============================================"
             echo "FBC URBAN INTELLIGENCE SYSTEM CERTIFICATE"
             echo "SYSTEM VERSION: ${FBC_SYSTEM_VERSION}"
             echo "DATA MODE: ${FBC_DATA_MODE}"
-            echo "AUDIT STATUS: ALL SYSTEM LAYERS VERIFIED"
+            echo "AUDIT STATUS: ALL LAYERS VERIFIED"
+            echo "ZERO TRUST CI: ENFORCED"
             echo "TIMESTAMP (UTC): $(date -u)"
             echo "CERTIFICATION LEVEL: ENTERPRISE READY"
             echo "============================================"
           } > FBC_SYSTEM_CERTIFICATE.txt
 
-      - name: Upload Certification Artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: FBC_SYSTEM_CERTIFICATE
           path: FBC_SYSTEM_CERTIFICATE.txt
