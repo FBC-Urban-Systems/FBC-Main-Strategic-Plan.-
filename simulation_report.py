@@ -1,8 +1,10 @@
 # =========================================================
 # PATH: /simulation_report.py
 # DESCRIPTION: Global Simulation Report Export Engine
-# VERSION: v2.0.0 — REAL DATA SAFE • FUTURE PROOF
+# VERSION: v2.0.0 (ENTERPRISE STABLE)
+# CLASSIFICATION: PRODUCTION / AUDIT / CI-SAFE
 # ROLE: Deterministic, Auditable Export Layer for Simulation Outputs
+# DATA MODE: REALISTIC-DETERMINISTIC
 # =========================================================
 
 import json
@@ -30,10 +32,13 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 def export_reports() -> Dict[str, Any]:
     """
     Executes the global simulation and exports results
-    in multiple deterministic formats (JSON, CSV).
+    in deterministic, audit-safe formats (JSON mandatory, CSV best-effort).
 
-    Returns:
-        dict: Export metadata and file paths
+    Guarantees:
+    - No mutation of simulation output
+    - Deterministic timestamp-based filenames
+    - CI-safe execution
+    - Graceful degradation for non-tabular data
     """
 
     results = run_global_simulation()
@@ -45,7 +50,7 @@ def export_reports() -> Dict[str, Any]:
     base_filename = f"simulation_{timestamp}"
 
     # -----------------------
-    # JSON EXPORT
+    # JSON EXPORT (MANDATORY)
     # -----------------------
     json_path = os.path.join(REPORT_DIR, f"{base_filename}.json")
     with open(json_path, "w", encoding="utf-8") as f:
@@ -58,14 +63,15 @@ def export_reports() -> Dict[str, Any]:
         )
 
     # -----------------------
-    # CSV EXPORT
+    # CSV EXPORT (OPTIONAL)
     # -----------------------
+    csv_path = None
     try:
         df = pd.DataFrame(results)
         csv_path = os.path.join(REPORT_DIR, f"{base_filename}.csv")
         df.to_csv(csv_path, index=False)
     except Exception:
-        csv_path = None  # CSV is optional depending on structure
+        csv_path = None  # Non-tabular or incompatible structure
 
     return {
         "status": "EXPORT_SUCCESS",
@@ -77,12 +83,12 @@ def export_reports() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------
-# CLI ENTRYPOINT
+# CLI ENTRYPOINT (CI SAFE)
 # ---------------------------------------------------------
 if __name__ == "__main__":
     metadata = export_reports()
 
-    print("\n📊 FBC Simulation Reports Generated")
+    print("\nFBC Simulation Reports Generated")
     print("----------------------------------")
     print(f"Status        : {metadata['status']}")
     print(f"Timestamp UTC : {metadata['timestamp_utc']}")
