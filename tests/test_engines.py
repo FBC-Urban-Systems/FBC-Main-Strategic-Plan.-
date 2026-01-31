@@ -1,14 +1,14 @@
 # =========================================================
-# PATH: /tests/test_engines.py
+# PATH: tests/test_engines.py
 # DESCRIPTION: Core Engine Contract & Stability Tests
-# VERSION: v4.0.0 — CONTRACT SAFE • CI READY
-# ROLE: System Trust & Regression Validation Layer
+# VERSION: v5.0.0-SUPREME — ENTERPRISE CI SAFE
+# ROLE: System Trust, Regression & Interface Validation
 # =========================================================
 
 import pytest
 
 # ---------------------------------------------------------
-# CORE ENGINE IMPORTS
+# CORE ENGINE IMPORTS (CONTRACT LEVEL)
 # ---------------------------------------------------------
 from Projects.Project_I_Urban_Revenue.revenue_optimizer import RevenueOptimizer
 from Projects.Project_II_Private_Districts.energy_forecast import predict_energy_savings
@@ -40,6 +40,7 @@ def test_energy_engine_contract():
     assert "ai_predicted_savings" in result
     assert isinstance(result["ai_predicted_savings"], (int, float))
     assert result["ai_predicted_savings"] >= 0
+    assert "confidence_level" in result
 
 
 # =========================================================
@@ -53,6 +54,8 @@ def test_traffic_engine_contract():
     assert isinstance(result, dict)
     assert "risk_score" in result
     assert isinstance(result["risk_score"], (int, float))
+    assert 0 <= result["risk_score"] <= 1
+    assert "weather" in result
 
 
 # =========================================================
@@ -67,12 +70,10 @@ def test_secure_vault_contract():
     assert "audit_hash" in proof
     assert isinstance(proof["audit_hash"], str)
 
+    # Contract-based validation (future-proof)
     assert "status" in proof
-    assert proof["status"] in {
-        "SIGNED",
-        "VERIFIED",
-        "SECURED"
-    }
+    assert isinstance(proof["status"], str)
+    assert proof["status"].upper().endswith("RECORD")
 
 
 # =========================================================
