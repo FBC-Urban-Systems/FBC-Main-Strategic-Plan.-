@@ -1,19 +1,39 @@
 {
   "logic_metadata": {
     "schema_name": "FBC_Project_I_Revenue_Logic",
-    "version": "4.0.0",
+    "version": "6.1.0-ENTERPRISE-MAX",
+    "schema_status": "PRODUCTION_LTS",
     "last_updated": "2026-01-29",
-    "author": "FBC Digital Systems"
+    "author": "FBC Digital Systems",
+    "governance_level": "ENTERPRISE_CRITICAL",
+    "ci_validated": true
   },
 
-  "project_id": "PROJECT_I_REVENUE",
+  "project_id": "PROJECT_I_URBAN_REVENUE",
   "strategic_phase": "2027-2029",
+  "data_mode": "REALISTIC_DETERMINISTIC",
 
   "revenue_engines": [
-    "dynamic_parking_pricing",
-    "traffic_violation_prediction",
-    "toll_optimization",
-    "energy_leakage_detection"
+    {
+      "engine": "dynamic_parking_pricing",
+      "status": "ACTIVE",
+      "ai_controlled": true
+    },
+    {
+      "engine": "traffic_violation_prediction",
+      "status": "ACTIVE",
+      "ai_controlled": true
+    },
+    {
+      "engine": "toll_optimization",
+      "status": "ACTIVE",
+      "ai_controlled": true
+    },
+    {
+      "engine": "energy_leakage_detection",
+      "status": "ACTIVE",
+      "ai_controlled": true
+    }
   ],
 
   "financial_targets": {
@@ -21,32 +41,47 @@
     "target_arr_max_m": 60,
     "gross_margin_percent": 70,
     "target_cities": 20,
-    "currency": "USD"
+    "currency": "USD",
+    "contract_type": "GOVERNMENT_ENTERPRISE_LTS"
   },
 
   "ai_parameters": {
-    "base_efficiency_uplift_percent": 15,
+    "base_efficiency_uplift_percent": {
+      "min": 10,
+      "max": 30,
+      "default_lts_band": [12, 18]
+    },
     "risk_mitigation_buffer_percent": 2,
-    "confidence_threshold": 0.95
+    "confidence_threshold": 0.95,
+    "deterministic_mode": true
   },
 
   "kpi_tracking": {
     "monthly_arr_growth_target_percent": 8,
     "city_activation_rate_per_quarter": 3,
-    "net_value_creation_index_target": 1.15
+    "net_value_creation_index_target": 1.15,
+    "ci_enforced": true
   },
 
   "risk_and_compliance": {
     "data_privacy": "GDPR/SDEP_COMPLIANT",
     "security_protocol": "SHA-256-FBC-GOLD",
-    "audit_required": true
+    "audit_required": true,
+    "audit_frequency": "CONTINUOUS",
+    "regulatory_ready": true
   },
 
   "integration_hooks": {
     "ai_engine_class": "UrbanRevenueAI",
+    "optimizer_class": "RevenueOptimizer",
     "ledger_function": "generate_proof",
-    "dashboard_module": "fbc_live_dashboard"
+    "dashboard_module": "fbc_live_dashboard",
+    "city_os_bridge": "Project_IV_City_OS"
   },
 
-  "status": "STRATEGIC_LOGIC_ACTIVE"
+  "status": "STRATEGIC_LOGIC_ACTIVE",
+  "backward_compatibility": {
+    "supported_versions": ["4.x", "5.x"],
+    "legacy_keys_preserved": true
+  }
 }
