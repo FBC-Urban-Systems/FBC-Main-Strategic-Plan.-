@@ -4,12 +4,15 @@
 #
 # ROLE:
 # - Pure package initializer
-# - No side effects
-# - No lazy loading
-# - No guards
-# - CI-safe by design
+# - Zero side effects
+# - Deterministic versioning
+# - Enterprise CI-safe
 #
-# VERSION: v3.0.0
+# VERSION: v5.0.0-ENTERPRISE-LTS
 # =====================================================
 
-__version__ = "3.0.0"
+__all__ = []
+
+__version__ = "5.0.0-ENTERPRISE-LTS"
+__package_name__ = "FBC Projects"
+__organization__ = "FBC Digital Systems"
