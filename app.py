@@ -37,7 +37,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.title("🌍 FBC Global Command Center")
+st.title("FBC Global Command Center")
 st.caption("Supreme Real-Data Urban Intelligence Platform")
 
 st.markdown("---")
@@ -48,17 +48,17 @@ st.markdown("---")
 module = st.sidebar.radio(
     "Select Intelligence Module",
     (
-        "🚦 Traffic Risk Analysis",
-        "💰 Revenue Projection",
-        "⚡ Energy Savings Forecast",
+        "Traffic Risk Analysis",
+        "Revenue Projection",
+        "Energy Savings Forecast",
     ),
 )
 
 # ==========================================================
 # MODULE 1 — TRAFFIC RISK
 # ==========================================================
-if module.startswith("🚦"):
-    st.header("🚦 Real-Time Traffic Risk Intelligence")
+if module.startswith("Traffic"):
+    st.header("Real-Time Traffic Risk Intelligence")
 
     city = st.text_input("City Name", value="Cairo")
     density = st.slider("Traffic Density Index", 0, 300, 120)
@@ -72,7 +72,7 @@ if module.startswith("🚦"):
         st.metric("Risk Score", result["risk_score"])
         st.write("Weather Condition:", result["weather"])
 
-        if st.button("📄 Generate PDF Report"):
+        if st.button("Generate PDF Report"):
             pdf_path = os.path.join(REPORTS_DIR, f"Traffic_Report_{city}.pdf")
             generate_fbc_report(
                 "Traffic Risk Analysis Report",
@@ -87,7 +87,7 @@ if module.startswith("🚦"):
 
             with open(pdf_path, "rb") as f:
                 st.download_button(
-                    "⬇️ Download PDF",
+                    "Download PDF",
                     data=f,
                     file_name=os.path.basename(pdf_path),
                 )
@@ -95,8 +95,8 @@ if module.startswith("🚦"):
 # ==========================================================
 # MODULE 2 — REVENUE
 # ==========================================================
-elif module.startswith("💰"):
-    st.header("💰 GDP-Based Urban Revenue Projection")
+elif module.startswith("Revenue"):
+    st.header("GDP-Based Urban Revenue Projection")
 
     city = st.text_input("City Name", value="Cairo")
     annual_revenue = st.number_input(
@@ -114,7 +114,7 @@ elif module.startswith("💰"):
 
         st.metric("Projected Total Gain", f"${result['Total_City_Gain']:,.2f}")
 
-        if st.button("📄 Generate PDF Report"):
+        if st.button("Generate PDF Report"):
             pdf_path = os.path.join(REPORTS_DIR, f"Revenue_Report_{city}.pdf")
             generate_fbc_report(
                 "Urban Revenue Projection Report",
@@ -124,7 +124,7 @@ elif module.startswith("💰"):
 
             with open(pdf_path, "rb") as f:
                 st.download_button(
-                    "⬇️ Download PDF",
+                    "Download PDF",
                     data=f,
                     file_name=os.path.basename(pdf_path),
                 )
@@ -133,7 +133,7 @@ elif module.startswith("💰"):
 # MODULE 3 — ENERGY
 # ==========================================================
 else:
-    st.header("⚡ Energy Cost Optimization & Savings")
+    st.header("Energy Cost Optimization & Savings")
 
     annual_energy_bill = st.number_input(
         "Annual Energy Bill (USD)",
@@ -152,7 +152,7 @@ else:
             f"${result['ai_predicted_savings']:,.2f}",
         )
 
-        if st.button("📄 Generate PDF Report"):
+        if st.button("Generate PDF Report"):
             pdf_path = os.path.join(REPORTS_DIR, "Energy_Report.pdf")
             generate_fbc_report(
                 "Energy Savings Forecast Report",
@@ -162,7 +162,7 @@ else:
 
             with open(pdf_path, "rb") as f:
                 st.download_button(
-                    "⬇️ Download PDF",
+                    "Download PDF",
                     data=f,
                     file_name=os.path.basename(pdf_path),
                 )
