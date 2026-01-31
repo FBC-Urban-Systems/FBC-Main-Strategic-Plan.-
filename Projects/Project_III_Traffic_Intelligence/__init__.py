@@ -6,8 +6,8 @@ Package Role:
 City-scale traffic risk intelligence engines providing
 deterministic, auditable, and insurance-grade analytics.
 
-Version: v7.0.0
-Classification: Executive-Critical
+Version: v5.0.0-ENTERPRISE-LTS
+Classification: MISSION_CRITICAL
 """
 
 from __future__ import annotations
@@ -16,15 +16,17 @@ __all__ = [
     "TrafficRiskEngine",
     "__version__",
     "__package_role__",
-    "__classification__"
+    "__classification__",
+    "__stability__"
 ]
 
 # ------------------------------------------------------------
 # Package Metadata
 # ------------------------------------------------------------
-__version__ = "7.0.0"
+__version__ = "5.0.0"
 __package_role__ = "TRAFFIC_RISK_INTELLIGENCE_CORE"
-__classification__ = "EXECUTIVE_CRITICAL"
+__classification__ = "MISSION_CRITICAL"
+__stability__ = "LTS"
 
 # ------------------------------------------------------------
 # Public API
